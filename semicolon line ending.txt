@@ -1,0 +1,59 @@
+semicolon line ending
+(?'number'#[[:space:]]*[A-z]+)|(?'string'§[[:space:]]*[A-z]+)|(?'assignment'[A-z]+=[A-z]+)
+
+
+types:
+½ bool
+# number
+§ string
+
+if/elseif/else statement:
+?:
+..¤?:
+..¤
+..
+
+while loop:
+!:
+..
+
+function:
+functionA-- > #:
+..
+
+print console:
+>>
+
+read console:
+<<
+
+example
+```
+stringConcat-§a, §b->§:
+    §c = a + b;
+
+    toUpper-§s->§:
+        >>s;
+    ..
+
+    >>c;
+..
+
+§pyramid = #;
+
+#height;
+
+height<<;
+
+
+#i = 0;
+!i < height:
+    pyramid>>;
+    pyramid = stringConcat-pyramid, #-;
+..
+
+
+
+stringConcat-§a,§b->§:§c=a+b;>c;..§pyramid=#;#height;height<<;#i=0;!i<height:pyramid>>;pyramid = stringConcat-pyramid,#-;..
+
+```
