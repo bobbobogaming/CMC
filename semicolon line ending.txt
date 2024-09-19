@@ -7,10 +7,9 @@ types:
 # number
 § string
 
-if/elseif/else statement:
+if/else statement:
 ?:
-..¤?:
-..¤
+..¤:
 ..
 
 while loop:
