@@ -11,7 +11,7 @@ public class Scanner {
     private SourceFile source;
 
     private char currentChar;
-    private final StringBuffer currentSpelling = new StringBuffer();
+    private final StringBuffer currentSpelling = new StringBuffer(); //I think StringBuilder is better for single thread, but yea
     private final Map<String, TokenKind> stringTokens;
     private final Set<String> tokensWithMoreThanOneChar = new HashSet<>();
 
@@ -36,20 +36,18 @@ public class Scanner {
     }
 
     private void skipWhitespace() {
-        while (currentChar == ' ' || currentChar == '\n' || currentChar == '\r' || currentChar == '\t') {
+        while (Character.isWhitespace(currentChar)) {
             currentChar = source.getSource();
         }
     }
 
-    private static boolean isLetter(char c)
-    {
+    private static boolean isLetter(char c) {
         //There is a Character.isLetter(), but we might want to use the danish symbols for something else.
         return c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z';
     }
 
 
-    private static boolean isDigit(char c)
-    {
+    private static boolean isDigit(char c) {
         return Character.isDigit(c);
     }
 
@@ -60,7 +58,8 @@ public class Scanner {
     }
 
     private TokenKind scanToken() {
-        if(stringTokens.containsKey("" + currentChar) || isStringInLongerTokens("" + currentChar)) {
+        String currentCharStr = Character.toString(currentChar);
+        if(stringTokens.containsKey(currentCharStr) || isStringInLongerTokens(currentCharStr)) {
             return TokensWithDeterminedGrammar();
         } else if (isDigit(currentChar)) {
             return NumericToken();
@@ -71,42 +70,35 @@ public class Scanner {
         }
 
         System.out.println(stringTokens.keySet());
-        throw new IllegalArgumentException(String.valueOf(ERROR) + " Current Char: " + currentChar + " Current Spelling: " + currentSpelling);
+        throw new IllegalArgumentException(ERROR + " Current Char: " + currentChar + " Current Spelling: " + currentSpelling);
     }
 
     private TokenKind TokensWithDeterminedGrammar() {
-        appendChar();
-        while(isStringInLongerTokens(currentSpelling.toString() + currentChar)) {
+        do {
             appendChar();
-        }
+        } while (isStringInLongerTokens(currentSpelling.toString() + currentChar));
         return stringTokens.containsKey(currentSpelling.toString()) ? stringTokens.get(currentSpelling.toString()) : IdentifierToken();
         //If it ends up not being a determined one, it can only be Identifier, since we don't allow tings to start with numbers.
     }
 
     private TokenKind NumericToken() {
-        while (isDigit(currentChar)) {
+        do {
             appendChar();
-        }
+        } while (isDigit(currentChar));
         return TokenKind.NUMERIC;
     }
 
     private TokenKind IdentifierToken() {
-        appendChar();
-        while(isLetter(currentChar) || isDigit(currentChar)) {
+        do {
+            appendChar();
             if(stringTokens.containsKey(currentSpelling.toString())) {
                 return stringTokens.get(currentSpelling.toString());
             }
-            appendChar();
-        }
+        } while(isLetter(currentChar) || isDigit(currentChar));
         return TokenKind.IDENTIFIER;
     }
 
     private boolean isStringInLongerTokens(String check) {
-        for(String token : tokensWithMoreThanOneChar) {
-            if(token.startsWith(check)) {
-                return true;
-            }
-        }
-        return false;
+        return tokensWithMoreThanOneChar.stream().anyMatch(token -> token.startsWith(check));
     }
 }

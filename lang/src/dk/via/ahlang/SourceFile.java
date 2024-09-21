@@ -1,8 +1,6 @@
 package dk.via.ahlang;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 
 public class SourceFile
 {
@@ -10,16 +8,18 @@ public class SourceFile
     public static final char EOT = 0;
 
 
-    private FileInputStream source;
+    private BufferedReader source;
 
 
     public SourceFile( String sourceFileName )
     {
         try {
-            source = new FileInputStream( sourceFileName );
+            source = new BufferedReader(new InputStreamReader(new FileInputStream(sourceFileName), "UTF-8"));
         } catch( FileNotFoundException ex ) {
             System.out.println( "*** FILE NOT FOUND *** (" + sourceFileName + ")" );
             System.exit( 1 );
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
         }
     }
 

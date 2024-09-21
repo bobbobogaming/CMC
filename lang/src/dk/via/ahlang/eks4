@@ -1,0 +1,18 @@
+stringConcat(§a, §b)§:
+    §c = a + b;
+    toUpper(§s)§:
+        >>s;
+    ..
+    >>c;
+..
+
+§pyramid = #;
+#height;
+
+height<<;
+
+#i=0;
+!1 < height:
+    pyramid>>;
+    pyramid = stringConcat(pyramid, #);
+..

@@ -13,7 +13,7 @@ public class TestDriver {
 
             Token t = s.scan();
             while(t.kind != TokenKind.EOT) {
-                System.out.println( t.kind + " " + t.spelling );
+                System.out.println(t.kind + " " + t.spelling);
 
                 t = s.scan();
             }
