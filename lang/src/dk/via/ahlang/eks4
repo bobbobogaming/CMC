@@ -1,4 +1,4 @@
-stringConcat(§a, §b)§:
+ stringConcat(§a, §b)§:
     §c = a + b;
     toUpper(§s)§:
         >>s;

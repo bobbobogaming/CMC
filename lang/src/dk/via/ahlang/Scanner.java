@@ -17,8 +17,8 @@ public class Scanner {
 
     public Scanner(SourceFile source) {
         this.source = source;
-
         currentChar = source.getSource();
+        skipWhitespace();
         stringTokens = getTokensWithSpelling();
 
         //Finding tokens with more than one char from here
