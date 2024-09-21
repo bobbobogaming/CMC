@@ -17,12 +17,12 @@ import javax.swing.*;
  
 public class TestDriverScanner
 {
-	private static final String EXAMPLES_DIR = "c:\\usr\\undervisning\\CMC\\IntLang\\examples";
+	private static final String EXAMPLES_DIR = System.getProperty("user.dir") + "\\lang\\src\\dk\\via\\sas\\intlang";
 	
 	
-	public static void main( String args[] )
+	public static void main(String[] args)
 	{
-		JFileChooser fc = new JFileChooser( EXAMPLES_DIR );
+		JFileChooser fc = new JFileChooser(EXAMPLES_DIR);
 		
 		if( fc.showOpenDialog( null ) == JFileChooser.APPROVE_OPTION ) {
 			SourceFile in = new SourceFile( fc.getSelectedFile().getAbsolutePath() );

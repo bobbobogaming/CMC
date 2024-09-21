@@ -17,7 +17,7 @@ while loop:
 ..
 
 function:
-functionA-- > #:
+functionA-- > #: kan være problematisk mes - og < når de også er operatører
 ..
 
 print console:

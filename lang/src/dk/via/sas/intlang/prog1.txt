@@ -1,0 +1,25 @@
+declare
+   func power(a,b)
+   declare
+      var res;
+   do
+      res := 1;
+      while b do
+         res := a * res;
+         b := b - 1;
+      od;
+   od
+   return res;
+
+   var n;
+   var todo;
+do
+   todo := 10;
+   n := 1;
+   while todo do
+      say power(2,n);
+
+      n := n + 1;
+      todo := todo - 1;
+   od;
+od
