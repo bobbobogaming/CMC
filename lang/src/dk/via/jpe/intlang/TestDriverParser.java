@@ -6,7 +6,7 @@
  * 28.09.2006 Original version
  */
   
-package dk.via.sas.intlang;
+package dk.via.jpe.intlang;
 
 
 import javax.swing.*;

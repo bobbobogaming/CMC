@@ -8,10 +8,10 @@
  * 17.09.2006 Original Version (based on Example 4.2 in Watt&Brown)
  */
  
-package dk.via.sas.intlang;
+package dk.via.jpe.intlang;
 
 
-import static dk.via.sas.intlang.TokenKind.*;
+import static dk.via.jpe.intlang.TokenKind.*;
 
 
 public class Token

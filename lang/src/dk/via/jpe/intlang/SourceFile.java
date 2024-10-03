@@ -4,7 +4,7 @@
  * 22.09.2006 Original version (adapted from Watt&Brown)
  */
  
-package dk.via.sas.intlang;
+package dk.via.jpe.intlang;
 
 
 import java.io.*;

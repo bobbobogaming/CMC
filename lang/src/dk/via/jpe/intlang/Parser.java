@@ -7,11 +7,9 @@
  * 28.09.2006 Original version (based on Watt&Brown)
  */
   
-package dk.via.sas.intlang;
+package dk.via.jpe.intlang;
 
-
-import static dk.via.sas.intlang.TokenKind.*;
-
+import static dk.via.jpe.intlang.TokenKind.*;
 
 public class Parser
 {

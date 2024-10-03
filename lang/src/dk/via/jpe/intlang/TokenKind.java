@@ -3,7 +3,7 @@
  */
 
 
-package dk.via.sas.intlang;
+package dk.via.jpe.intlang;
 
 
 public enum TokenKind
