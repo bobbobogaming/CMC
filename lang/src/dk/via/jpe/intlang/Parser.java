@@ -45,7 +45,6 @@ public class Parser
 		accept( OD );
 	}
 	
-	
 	private void parseDeclarations()
 	{
 		while( currentTerminal.kind == VAR ||

@@ -3,8 +3,9 @@ power(#a, #b)#:
 	!b > 0:
  		result = result * a;
 		b = b - 1;
+		/*Dette er en test*/
 	..
-	-> result;
+	-> result /*Det er dette også*/  ;
 ..
 
 #todo = 10;

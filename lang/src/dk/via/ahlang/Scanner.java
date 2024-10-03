@@ -4,16 +4,14 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import static dk.via.ahlang.TokenKind.ERROR;
-import static dk.via.ahlang.TokenKind.getTokensWithSpelling;
+import static dk.via.ahlang.TokenKind.*;
 
 public class Scanner {
-    private SourceFile source;
-
+    private final SourceFile source;
     private char currentChar;
-    private final StringBuffer currentSpelling = new StringBuffer(); //I think StringBuilder is better for single thread, but yea
+    private final StringBuilder currentSpelling = new StringBuilder();
     private final Map<String, TokenKind> stringTokens;
-    private final Set<String> tokensWithMoreThanOneChar = new HashSet<>();
+    private final Set<String> multiCharTokens = new HashSet<>();
 
     public Scanner(SourceFile source) {
         this.source = source;
@@ -24,12 +22,12 @@ public class Scanner {
         //Finding tokens with more than one char from here
         for (String token : stringTokens.keySet()) {
             if (token.length() > 1) {
-                tokensWithMoreThanOneChar.add(token);
+                multiCharTokens.add(token);
             }
         }
     }
 
-    private void appendChar() {
+    private void  appendChar() {
         currentSpelling.append(currentChar);
         currentChar = source.getSource();
         skipWhitespace();
@@ -41,16 +39,6 @@ public class Scanner {
         }
     }
 
-    private static boolean isLetter(char c) {
-        //There is a Character.isLetter(), but we might want to use the danish symbols for something else.
-        return c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z';
-    }
-
-
-    private static boolean isDigit(char c) {
-        return Character.isDigit(c);
-    }
-
     public Token scan() {
         currentSpelling.delete(0, currentSpelling.length());
         TokenKind kind = scanToken();
@@ -60,45 +48,73 @@ public class Scanner {
     private TokenKind scanToken() {
         String currentCharStr = Character.toString(currentChar);
         if(stringTokens.containsKey(currentCharStr) || isStringInLongerTokens(currentCharStr)) {
-            return TokensWithDeterminedGrammar();
-        } else if (isDigit(currentChar)) {
-            return NumericToken();
-        } else if(isLetter(currentChar)) {
-            return IdentifierToken();
-        } else if (stringTokens.get(Character.toString(currentChar)) == TokenKind.EOT) {
-            return TokenKind.EOT;
+            return determinedTokens();
+        } else if (Character.isDigit(currentChar)) {
+            return numericToken();
+        } else if(Character.isLetter(currentChar)) {
+            return identifierToken();
         }
 
         System.out.println(stringTokens.keySet());
         throw new IllegalArgumentException(ERROR + " Current Char: " + currentChar + " Current Spelling: " + currentSpelling);
     }
 
-    private TokenKind TokensWithDeterminedGrammar() {
+    private TokenKind determinedTokens() {
         do {
             appendChar();
+            if(stringTokens.get(currentSpelling.toString()) == STRING) {return handleStringToken();}
+            if(stringTokens.get(currentSpelling.toString()) == COMMENTSTART) {return removeComment();}
         } while (isStringInLongerTokens(currentSpelling.toString() + currentChar));
-        return stringTokens.containsKey(currentSpelling.toString()) ? stringTokens.get(currentSpelling.toString()) : IdentifierToken();
+        return stringTokens.containsKey(currentSpelling.toString()) ? stringTokens.get(currentSpelling.toString()) : identifierToken();
         //If it ends up not being a determined one, it can only be Identifier, since we don't allow tings to start with numbers.
     }
 
-    private TokenKind NumericToken() {
-        do {
+    private TokenKind handleStringToken() {
+        while(stringTokens.get(Character.toString(currentChar)) != STRING) {
+            if(stringTokens.get(Character.toString(currentChar)) == EOT) {
+                throw new IllegalArgumentException(ERROR + " Current Char: " + currentChar + " Current Spelling: " + currentSpelling + " Missing end indicator for string token");
+            }
             appendChar();
-        } while (isDigit(currentChar));
-        return TokenKind.NUMERIC;
+        } //This isn't very flex in case we want to change the symbol to more than one, but i wanna get a move on
+        appendChar();
+        return STRING;
     }
 
-    private TokenKind IdentifierToken() {
+    private TokenKind removeComment() { //Not very happy with how I've built this up
+        currentSpelling.delete(0, currentSpelling.length());
+        StringBuilder comment = new StringBuilder();
+        do {
+            comment.append(source.getSource());
+            if (stringTokens.get(comment.toString()) == EOT) {
+                throw new IllegalArgumentException(ERROR + " Current Char: " + currentChar + " Current Spelling: " + currentSpelling + " Doesn't end comment section off");
+            }
+            if (!isStringInLongerTokens(comment.toString())) {
+                comment.setLength(0);
+            }
+        } while (stringTokens.get(comment.toString()) != COMMENTEND);
+        currentChar = source.getSource();
+        skipWhitespace();
+        return scanToken();
+    }
+
+    private TokenKind identifierToken() {
         do {
             appendChar();
             if(stringTokens.containsKey(currentSpelling.toString())) {
                 return stringTokens.get(currentSpelling.toString());
             }
-        } while(isLetter(currentChar) || isDigit(currentChar));
-        return TokenKind.IDENTIFIER;
+        } while(Character.isLetter(currentChar) || Character.isDigit(currentChar));
+        return IDENTIFIER;
+    }
+
+    private TokenKind numericToken() {
+        do {
+            appendChar();
+        } while (Character.isDigit(currentChar));
+        return NUMERIC;
     }
 
     private boolean isStringInLongerTokens(String check) {
-        return tokensWithMoreThanOneChar.stream().anyMatch(token -> token.startsWith(check));
+        return multiCharTokens.stream().anyMatch(token -> token.startsWith(check));
     }
 }

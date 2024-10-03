@@ -6,7 +6,7 @@
     -> c;
 ..
 
-§pyramid = '#';/*string literal*/
+§pyramid = '#kug';/*string literal*/
 #height;
 
 << height;

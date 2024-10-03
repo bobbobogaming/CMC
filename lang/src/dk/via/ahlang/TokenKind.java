@@ -23,6 +23,9 @@ public enum TokenKind {
     CONSOLEIN("<<"),
     CONSOLEOUT(">>"),
     END(".."),
+    COMMENTSTART("/*"),
+    COMMENTEND("*/"),
+    STRING("'"),
     ERROR,
     EOT(Character.toString(0)),
     ;
