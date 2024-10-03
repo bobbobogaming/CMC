@@ -1,9 +1,9 @@
  stringConcat(§a, §b)§:
     §c = a + b;
     toUpper(§s)§:
-        return s;
+        -> s;
     ..
-    return c;
+    -> c;
 ..
 
 §pyramid = #;

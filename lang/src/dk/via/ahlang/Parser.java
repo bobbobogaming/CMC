@@ -117,12 +117,7 @@ public class Parser {
 
 	private void parseConsoleOut() { // TODO Finish. everything between the `CONSOLEOUT` and `SEMICOLON` should maybe be a method like jans `parsePrimary()`
 		accept(CONSOLEOUT);
-		if (currentTerminal.kind == NUMERIC) {
-			accept(NUMERIC);
-			// TODO consider if calculations are allowed here and if it shouldn't be it's own method
-		} else {
-
-		}
+		accept(IDENTIFIER);
 		accept(SEMICOLON);
 	}
 
