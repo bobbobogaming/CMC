@@ -44,10 +44,25 @@ public class Parser {
 	private void parseStatement() { //TODO finish
 		switch (currentTerminal.kind) {
 			case IF, WHILE -> parseControlFlow();
+			case TYPE, FUNCTIONKEY -> parseDeclaration();
+			case IDENTIFIER -> parseAssignment();
+			case CONSOLEIN -> parseConsoleIn();
+			case CONSOLEOUT -> parseConsoleOut();
 		}
 	}
 
-	private void parseControlFlow() { //TODO finish
+	private void parseAssignment() {
+		accept(IDENTIFIER);
+		parseCalculation();
+		accept(SEMICOLON);
+	}
+	private void parseFunctionArguments() {
+		accept(LEFTPARAN);
+		parseArgumentList();
+		accept(RIGHTPARAN);
+	}
+
+	private void parseControlFlow() {
 		if (currentTerminal.kind == WHILE) {
 			accept(WHILE);
 			parseComparison();
@@ -64,16 +79,20 @@ public class Parser {
 	}
 
 	private void parseComparison() {
+		parseCalculation();
+		accept(OPERATOR);
+		parseCalculation();
+	}
+
+	private void parseCalculation() {
 		if (currentTerminal.kind == NUMERIC) {
 			accept(NUMERIC);
 		} else {
 			accept(IDENTIFIER);
 		}
 		accept(OPERATOR);
-		if (currentTerminal.kind == NUMERIC) {
-			accept(NUMERIC);
-		} else {
-			accept(IDENTIFIER);
+		if (currentTerminal.kind == NUMERIC || currentTerminal.kind == IDENTIFIER) {
+			parseCalculation();
 		}
 	}
 
@@ -91,6 +110,7 @@ public class Parser {
 			}
 			accept(SEMICOLON);
 		} else {
+			accept(FUNCTIONKEY);
 			accept(IDENTIFIER);
 			accept(LEFTPARAN);
 			parseParamList();

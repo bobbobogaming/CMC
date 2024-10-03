@@ -20,6 +20,7 @@ public enum TokenKind {
     ELSE("¤"),
     WHILE("!"),
     TYPE("½", "#", "§"),
+    FUNCTIONKEY("<->"),
     CONSOLEIN("<<"),
     CONSOLEOUT(">>"),
     END(".."),
