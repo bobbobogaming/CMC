@@ -35,7 +35,7 @@ public class Parser {
 		parseStatementCollection();
 		if (currentTerminal.kind == RETURN) {
 			accept(RETURN);
-			accept(IDENTIFIER);
+			accept(IDENTIFIER);// TODO change identifier til calculation
 			accept(SEMICOLON);
 		}
 		accept(END);
@@ -60,6 +60,39 @@ public class Parser {
 		accept(LEFTPARAN);
 		parseArgumentList();
 		accept(RIGHTPARAN);
+	}
+
+	private void parseArgumentList() {
+		if (currentTerminal.kind == NUMERIC) {// TODO change identifier and numeric til calculation
+			accept(NUMERIC);
+			parseArgumentListTail();
+		}
+		else if (currentTerminal.kind == STRING) {
+			accept(STRING);
+			parseArgumentListTail();
+		}
+		else if (currentTerminal.kind == IDENTIFIER) {
+			accept(IDENTIFIER);
+			parseArgumentListTail();
+		}
+	}
+
+	private void parseArgumentListTail() {
+		if (currentTerminal.kind == COMMA) {
+			accept(COMMA);
+			if (currentTerminal.kind == NUMERIC) {
+				accept(NUMERIC);
+				parseArgumentListTail();
+			}
+			else if (currentTerminal.kind == STRING) {
+				accept(STRING);
+				parseArgumentListTail();
+			}
+			else {
+				accept(IDENTIFIER);
+				parseArgumentListTail();
+			}
+		}
 	}
 
 	private void parseControlFlow() {
@@ -102,10 +135,14 @@ public class Parser {
 			accept(IDENTIFIER);
 			if (currentTerminal.spelling.equals("=")) {
 				accept(OPERATOR);
-				if (currentTerminal.kind == NUMERIC) { // TODO consider if we aren't missing string literals
+				if (currentTerminal.kind == NUMERIC) { // TODO change identifier and numeric til calculation
 					accept(NUMERIC);
-				} else {
+				}
+				else if (currentTerminal.kind == IDENTIFIER) {
 					accept(IDENTIFIER);
+				}
+				else {
+					accept(STRING);
 				}
 			}
 			accept(SEMICOLON);
@@ -135,13 +172,13 @@ public class Parser {
 		}
 	}
 
-	private void parseConsoleOut() { // TODO Finish. everything between the `CONSOLEOUT` and `SEMICOLON` should maybe be a method like jans `parsePrimary()`
+	private void parseConsoleOut() { // TODO change identifier til calculation
 		accept(CONSOLEOUT);
 		accept(IDENTIFIER);
 		accept(SEMICOLON);
 	}
 
-	private void parseConsoleIn() {
+	private void parseConsoleIn() { // TODO change identifier til calculation
 		accept(CONSOLEIN);
 		accept(IDENTIFIER);
 		accept(SEMICOLON);
