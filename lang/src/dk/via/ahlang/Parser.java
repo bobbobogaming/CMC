@@ -30,18 +30,18 @@ public class Parser {
 		}
 	}
 
-	private void parseBlock() { //TODO finish
+	private void parseBlock() {
 		accept(COLON);
 		parseStatementCollection();
 		if (currentTerminal.kind == RETURN) {
 			accept(RETURN);
-			accept(IDENTIFIER);// TODO change identifier til calculation
+			parseMathExpr();
 			accept(SEMICOLON);
 		}
 		accept(END);
 	}
 
-	private void parseStatement() { //TODO finish
+	private void parseStatement() {
 		switch (currentTerminal.kind) {
 			case IF, WHILE -> parseControlFlow();
 			case TYPE, FUNCTIONKEY -> parseDeclaration();
@@ -53,7 +53,8 @@ public class Parser {
 
 	private void parseAssignment() {
 		accept(IDENTIFIER);
-		parseCalculation();
+		accept(ASSIGN);
+		parseMathExpr();
 		accept(SEMICOLON);
 	}
 	private void parseFunctionArguments() {
@@ -63,35 +64,15 @@ public class Parser {
 	}
 
 	private void parseArgumentList() {
-		if (currentTerminal.kind == NUMERIC) {// TODO change identifier and numeric til calculation
-			accept(NUMERIC);
-			parseArgumentListTail();
-		}
-		else if (currentTerminal.kind == STRING) {
-			accept(STRING);
-			parseArgumentListTail();
-		}
-		else if (currentTerminal.kind == IDENTIFIER) {
-			accept(IDENTIFIER);
-			parseArgumentListTail();
-		}
+		parseMathExpr();
+		parseArgumentListTail();
 	}
 
 	private void parseArgumentListTail() {
 		if (currentTerminal.kind == COMMA) {
 			accept(COMMA);
-			if (currentTerminal.kind == NUMERIC) {
-				accept(NUMERIC);
-				parseArgumentListTail();
-			}
-			else if (currentTerminal.kind == STRING) {
-				accept(STRING);
-				parseArgumentListTail();
-			}
-			else {
-				accept(IDENTIFIER);
-				parseArgumentListTail();
-			}
+			parseMathExpr();
+			parseArgumentListTail();
 		}
 	}
 
@@ -112,38 +93,54 @@ public class Parser {
 	}
 
 	private void parseComparison() {
-		parseCalculation();
-		accept(OPERATOR);
-		parseCalculation();
+		parseMathExpr();
+		accept(COMPARISON);
+		parseMathExpr();
 	}
 
-	private void parseCalculation() {
+	private void parseMathExpr() {
+		parseSecondMathExpr();
+		if (currentTerminal.kind == ADDSUBOP) {
+			accept(ADDSUBOP);
+			parseMathExpr();
+		}
+	}
+
+	private void parseSecondMathExpr() {
+		parsePrimaryMathExpr();
+		if (currentTerminal.kind == MULDIVOP) {
+			accept(MULDIVOP);
+			parseSecondMathExpr();
+		}
+	}
+
+	private void parsePrimaryMathExpr() {
 		if (currentTerminal.kind == NUMERIC) {
 			accept(NUMERIC);
-		} else {
-			accept(IDENTIFIER);
 		}
-		accept(OPERATOR);
-		if (currentTerminal.kind == NUMERIC || currentTerminal.kind == IDENTIFIER) {
-			parseCalculation();
+		else if (currentTerminal.kind == STRING) {
+			accept(STRING);
+		}
+		else if (currentTerminal.kind == IDENTIFIER) {
+			accept(IDENTIFIER);
+			if (currentTerminal.kind == LEFTPARAN) {
+				parseFunctionArguments();
+			}
+		}
+		else if (currentTerminal.kind == LEFTPARAN) {
+			accept(LEFTPARAN);
+			parseMathExpr();
+			accept(RIGHTPARAN);
 		}
 	}
 
-	private void parseDeclaration() { //TODO check if finished
+	private void parseDeclaration() {
 		if (currentTerminal.kind == TYPE) {
 			parseType();
 			accept(IDENTIFIER);
-			if (currentTerminal.spelling.equals("=")) {
-				accept(OPERATOR);
-				if (currentTerminal.kind == NUMERIC) { // TODO change identifier and numeric til calculation
-					accept(NUMERIC);
-				}
-				else if (currentTerminal.kind == IDENTIFIER) {
-					accept(IDENTIFIER);
-				}
-				else {
-					accept(STRING);
-				}
+			if (currentTerminal.kind == ASSIGN) {
+				accept(ASSIGN);
+				parseMathExpr();
 			}
 			accept(SEMICOLON);
 		} else {
@@ -172,15 +169,15 @@ public class Parser {
 		}
 	}
 
-	private void parseConsoleOut() { // TODO change identifier til calculation
+	private void parseConsoleOut() {
 		accept(CONSOLEOUT);
-		accept(IDENTIFIER);
+		parseMathExpr();
 		accept(SEMICOLON);
 	}
 
-	private void parseConsoleIn() { // TODO change identifier til calculation
+	private void parseConsoleIn() {
 		accept(CONSOLEIN);
-		accept(IDENTIFIER);
+		parseMathExpr();
 		accept(SEMICOLON);
 	}
 
