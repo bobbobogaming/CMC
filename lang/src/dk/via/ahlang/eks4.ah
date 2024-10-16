@@ -14,5 +14,5 @@
 #i=0;
 !1 < height:
     >> pyramid;
-    pyramid = stringConcat(pyramid, #);
+    pyramid = stringConcat(pyramid, '#');
 ..

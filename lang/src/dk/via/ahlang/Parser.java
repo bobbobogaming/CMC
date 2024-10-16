@@ -1,5 +1,8 @@
 package dk.via.ahlang;
 
+import java.util.Arrays;
+import java.util.HashSet;
+
 import static dk.via.ahlang.TokenKind.*;
 
 public class Parser {
@@ -25,7 +28,10 @@ public class Parser {
 	}
 
 	private void parseStatementCollection() {
-		while (currentTerminal.kind != EOT) {
+		HashSet<TokenKind> tokens = new HashSet<>(
+			Arrays.asList(IF, WHILE,TYPE, FUNCTIONKEY,IDENTIFIER,CONSOLEIN, CONSOLEOUT));
+
+		while (tokens.contains(currentTerminal.kind)) {
 			parseStatement();
 		}
 	}
