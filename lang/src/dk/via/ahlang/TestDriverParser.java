@@ -1,6 +1,8 @@
 package dk.via.ahlang;
 
 
+import dk.via.ahlang.ast.Program;
+
 import javax.swing.*;
 
 public class TestDriverParser {
@@ -13,7 +15,8 @@ public class TestDriverParser {
 			Scanner s = new Scanner( in );
 			Parser p = new Parser( s );
 
-			p.parseProgram();
+			Program program = p.parseProgram();
+			new ASTViewer(program);
 		}
 
 	}

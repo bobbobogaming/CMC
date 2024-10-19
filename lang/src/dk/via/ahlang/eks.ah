@@ -1,4 +1,4 @@
-power(#a, #b)#:
+<->power(#a, #b)#:
 	#result = 1;
 	!b > 0:
  		result = result * a;

@@ -1,193 +1,256 @@
 package dk.via.ahlang;
 
+import dk.via.ahlang.ast.*;
+
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 
 import static dk.via.ahlang.TokenKind.*;
 
 public class Parser {
 	private final dk.via.ahlang.Scanner scan;
 
-
 	private Token currentTerminal;
 
-
-	public Parser( Scanner scan )
+	public Parser(Scanner scan)
 	{
 		this.scan = scan;
 
 		currentTerminal = scan.scan();
 	}
 
-	public void parseProgram()
+	public Program parseProgram()
 	{
-		parseStatementCollection();
+		StatementCol statementCol = parseStatementCollection();
 
 		if( currentTerminal.kind != EOT )
 			System.out.println( "Tokens found after end of program" );
+
+		return new Program(statementCol);
 	}
 
-	private void parseStatementCollection() {
+	private StatementCol parseStatementCollection() {
 		HashSet<TokenKind> tokens = new HashSet<>(
 			Arrays.asList(IF, WHILE,TYPE, FUNCTIONKEY,IDENTIFIER,CONSOLEIN, CONSOLEOUT));
+		StatementCol statementCol = new StatementCol();
 
 		while (tokens.contains(currentTerminal.kind)) {
-			parseStatement();
+			statementCol.statements.add(parseStatement());
 		}
+
+		return statementCol;
 	}
 
-	private void parseBlock() {
+	private Block parseBlock() {
 		accept(COLON);
-		parseStatementCollection();
+		StatementCol collection = parseStatementCollection();
+		Expression returnExpression = null;
 		if (currentTerminal.kind == RETURN) {
 			accept(RETURN);
-			parseMathExpr();
+			returnExpression = parseMathExpr();
 			accept(SEMICOLON);
 		}
 		accept(END);
+		return new Block(collection, returnExpression);
 	}
 
-	private void parseStatement() {
+	private Statement parseStatement() {
 		switch (currentTerminal.kind) {
-			case IF, WHILE -> parseControlFlow();
-			case TYPE, FUNCTIONKEY -> parseDeclaration();
-			case IDENTIFIER -> parseAssignment();
-			case CONSOLEIN -> parseConsoleIn();
-			case CONSOLEOUT -> parseConsoleOut();
+			case IF, WHILE -> {
+				return parseControlFlow();
+			}
+			case TYPE, FUNCTIONKEY -> {
+				return parseDeclaration();
+			}
+			case IDENTIFIER -> {
+				return parseAssignment();
+			}
+			case CONSOLEIN -> {
+				return parseConsoleIn();
+			}
+			case CONSOLEOUT -> {
+				return parseConsoleOut();
+			}
 		}
+		throw new RuntimeException("Unreachable");
 	}
 
-	private void parseAssignment() {
+	private Statement parseAssignment() {
+		Identifier identifier = new Identifier(currentTerminal.spelling);
 		accept(IDENTIFIER);
 		accept(ASSIGN);
-		parseMathExpr();
+		Expression expression = parseMathExpr();
 		accept(SEMICOLON);
+		return new Assignment(identifier, expression);
 	}
-	private void parseFunctionArguments() {
+	private List<Expression> parseFunctionArguments() {
 		accept(LEFTPARAN);
-		parseArgumentList();
+		List<Expression> list = parseArgumentList();
 		accept(RIGHTPARAN);
+		return list;
 	}
 
-	private void parseArgumentList() {
-		parseMathExpr();
-		parseArgumentListTail();
+	private List<Expression> parseArgumentList() {
+		List<Expression> list = new ArrayList<>();
+		list.add(parseMathExpr());
+		parseArgumentListTail(list);
+		return list;
 	}
 
-	private void parseArgumentListTail() {
+	private void parseArgumentListTail(List<Expression> list) {
 		if (currentTerminal.kind == COMMA) {
 			accept(COMMA);
-			parseMathExpr();
-			parseArgumentListTail();
+			list.add(parseMathExpr());
+			parseArgumentListTail(list);
 		}
 	}
 
-	private void parseControlFlow() {
+	private Statement parseControlFlow() {
 		if (currentTerminal.kind == WHILE) {
 			accept(WHILE);
-			parseComparison();
-			parseBlock();
-			return;
+			Expression condition = parseComparison();
+			Block block = parseBlock();
+			return new WhileStatement(condition, block);
 		}
 		accept(IF);
-		parseComparison();
-		parseBlock();
+		Expression condition = parseComparison();
+		Block block = parseBlock();
+		Block elseBlock = null;
 		if (currentTerminal.kind == ELSE) {
 			accept(ELSE);
-			parseBlock();
+			elseBlock = parseBlock();
 		}
+		return new IfStatement(condition, block, elseBlock);
 	}
 
-	private void parseComparison() {
-		parseMathExpr();
+	private Expression parseComparison() {
+		Expression left = parseMathExpr();
+		Operator operator = new Operator(currentTerminal.spelling);
 		accept(COMPARISON);
-		parseMathExpr();
+		Expression right = parseMathExpr();
+		return new BinaryExpression(left, operator, right);
 	}
 
-	private void parseMathExpr() {
-		parseSecondMathExpr();
+	private Expression parseMathExpr() {
+		Expression left = parseSecondMathExpr();
 		if (currentTerminal.kind == ADDSUBOP) {
+			Operator operator = new Operator(currentTerminal.spelling);
 			accept(ADDSUBOP);
-			parseMathExpr();
+			Expression right = parseMathExpr();
+			return new BinaryExpression(left, operator, right);
 		}
+		return left;
 	}
 
-	private void parseSecondMathExpr() {
-		parsePrimaryMathExpr();
+	private Expression parseSecondMathExpr() {
+		Expression left = parsePrimaryMathExpr();
 		if (currentTerminal.kind == MULDIVOP) {
+			Operator operator = new Operator(currentTerminal.spelling);
 			accept(MULDIVOP);
-			parseSecondMathExpr();
+			Expression right = parseSecondMathExpr();
+			return new BinaryExpression(left, operator, right);
 		}
+		return left;
 	}
 
-	private void parsePrimaryMathExpr() {
+	private Expression parsePrimaryMathExpr() {
 		if (currentTerminal.kind == NUMERIC) {
+			Numeric numeric = new Numeric(currentTerminal.spelling);
 			accept(NUMERIC);
+			return numeric;
 		}
 		else if (currentTerminal.kind == STRING) {
+			StringAH string = new StringAH(currentTerminal.spelling);
 			accept(STRING);
+			return string;
 		}
 		else if (currentTerminal.kind == IDENTIFIER) {
+			Identifier identifier = new Identifier(currentTerminal.spelling);
 			accept(IDENTIFIER);
 			if (currentTerminal.kind == LEFTPARAN) {
-				parseFunctionArguments();
+				return new FunctionCall(identifier, parseFunctionArguments());
 			}
+			return identifier;
 		}
 		else if (currentTerminal.kind == LEFTPARAN) {
 			accept(LEFTPARAN);
-			parseMathExpr();
+			Expression expr = parseMathExpr();
 			accept(RIGHTPARAN);
+			return expr;
 		}
+		throw new RuntimeException("Unreachable");
 	}
 
-	private void parseDeclaration() {
+	private Statement parseDeclaration() {
 		if (currentTerminal.kind == TYPE) {
-			parseType();
+			Type type = new Type(currentTerminal.spelling);
+			accept(TYPE);
+			Identifier identifier = new Identifier(currentTerminal.spelling);
 			accept(IDENTIFIER);
+			Expression initialValue = null;
 			if (currentTerminal.kind == ASSIGN) {
 				accept(ASSIGN);
-				parseMathExpr();
+				initialValue = parseMathExpr();
 			}
 			accept(SEMICOLON);
+			return new VariableDeclaration(type, identifier, initialValue);
 		} else {
 			accept(FUNCTIONKEY);
+			Identifier identifier = new Identifier(currentTerminal.spelling);
 			accept(IDENTIFIER);
 			accept(LEFTPARAN);
-			parseParamList();
+			List<Parameter> parameters = parseParamList();
 			accept(RIGHTPARAN);
-			parseType();
-			parseBlock();
+			Type returnType = null;
+			if (currentTerminal.kind == TYPE) { //TODO: Dont remember if we wanted to declare return type, but we have return as optional
+				returnType = new Type(currentTerminal.spelling);
+				accept(TYPE);
+			}
+			Block block = parseBlock();
+			return new FunctionDeclaration(identifier, parameters,returnType, block);
 		}
 	}
 
-	private void parseParamList() {
-		parseType();
+	private List<Parameter> parseParamList() {
+		List<Parameter> list = new ArrayList<>();
+		Type type = new Type(currentTerminal.spelling);
+		accept(TYPE);
+		Identifier identifier = new Identifier(currentTerminal.spelling);
 		accept(IDENTIFIER);
-		parseParamListTail();
+		list.add(new Parameter(type, identifier));
+		parseParamListTail(list);
+		return list;
 	}
 
-	private void parseParamListTail() {
+	private void parseParamListTail(List<Parameter> list) { //TODO: Think some of these methods can be done in a do while
 		if (currentTerminal.kind == COMMA) {
 			accept(COMMA);
-			parseType();
+			Type type = new Type(currentTerminal.spelling);
+			accept(TYPE);
+			Identifier identifier = new Identifier(currentTerminal.spelling);
 			accept(IDENTIFIER);
-			parseParamListTail();
+			list.add(new Parameter(type, identifier));
+			parseParamListTail(list);
 		}
 	}
 
-	private void parseConsoleOut() {
+	private Statement parseConsoleOut() {
 		accept(CONSOLEOUT);
-		parseMathExpr();
+		Expression expression = parseMathExpr();
 		accept(SEMICOLON);
+		return new ConsoleOutDeclaration(expression);
 	}
 
-	private void parseConsoleIn() {
+	private Statement parseConsoleIn() {
 		accept(CONSOLEIN);
-		parseMathExpr();
+		Expression expression = parseMathExpr();
 		accept(SEMICOLON);
+		return new ConsoleInDeclaration(expression);
 	}
 
-	private void parseType() {
+	private void parseType() { //Todo: Remove one line func
 		accept(TYPE);
 	}
 
