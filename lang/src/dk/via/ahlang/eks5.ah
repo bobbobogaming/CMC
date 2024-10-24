@@ -1,0 +1,9 @@
+#myNumbers[5];
+#myNumbers2[] = {5, 10, 50};
+§myStrings[] = {'cat', 'pølse', 'Guf'};
+
+myNumbers[0] = 10;
+myNumbers[1] = 20;
+myNumbers[2] = 30;
+myNumbers[3] = 40;
+myNumbers[4] = 50;

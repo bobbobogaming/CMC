@@ -1,6 +1,7 @@
 package dk.via.ahlang;
 
 import dk.via.ahlang.ast.*;
+import dk.via.jpe.intlang.ast.Declaration;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -80,10 +81,17 @@ public class Parser {
 	private Statement parseAssignment() {
 		Identifier identifier = new Identifier(currentTerminal.spelling);
 		accept(IDENTIFIER);
+		Numeric index = null;
+		if (currentTerminal.kind == OPENBRACKET) {
+			accept(OPENBRACKET);
+			index = new Numeric(currentTerminal.spelling);
+			accept(NUMERIC);
+			accept(CLOSEBRACKET);
+		}
 		accept(ASSIGN);
 		Expression expression = parseMathExpr();
 		accept(SEMICOLON);
-		return new Assignment(identifier, expression);
+		return new Assignment(identifier, expression, index);
 	}
 	private List<Expression> parseFunctionArguments() {
 		accept(LEFTPARAN);
@@ -189,6 +197,24 @@ public class Parser {
 			accept(TYPE);
 			Identifier identifier = new Identifier(currentTerminal.spelling);
 			accept(IDENTIFIER);
+			if (currentTerminal.kind == OPENBRACKET) {
+				accept(OPENBRACKET);
+				if (currentTerminal.kind == CLOSEBRACKET) {
+					accept(CLOSEBRACKET);
+					accept(ASSIGN);
+					accept(OPENCURLYBRACE);
+					List<Expression> list = parseArgumentList();
+					accept(CLOSECURLYBRACE);
+					accept(SEMICOLON);
+					return new VariableDeclaration(type, identifier, list);
+				}
+				Numeric numeric = new Numeric(currentTerminal.spelling);
+				accept(NUMERIC);
+				accept(CLOSEBRACKET);
+				accept(SEMICOLON);
+				return new VariableDeclaration(type, identifier, numeric);
+			}
+
 			Expression initialValue = null;
 			if (currentTerminal.kind == ASSIGN) {
 				accept(ASSIGN);
@@ -211,6 +237,22 @@ public class Parser {
 			Block block = parseBlock();
 			return new FunctionDeclaration(identifier, parameters,returnType, block);
 		}
+	}
+
+	private void parseArrayDeclaration() {
+		accept(OPENBRACKET);
+		if(currentTerminal.kind == NUMERIC) {
+			Numeric numeric = new Numeric(currentTerminal.spelling);
+			accept(NUMERIC);
+			accept(CLOSEBRACKET);
+			accept(SEMICOLON);
+		}
+		accept(CLOSEBRACKET);
+		accept(ASSIGN);
+		accept(OPENCURLYBRACE);
+		List<Expression> list = parseArgumentList();
+		accept(CLOSECURLYBRACE);
+		accept(SEMICOLON);
 	}
 
 	private List<Parameter> parseParamList() {
@@ -248,10 +290,6 @@ public class Parser {
 		Expression expression = parseMathExpr();
 		accept(SEMICOLON);
 		return new ConsoleInDeclaration(expression);
-	}
-
-	private void parseType() { //Todo: Remove one line func
-		accept(TYPE);
 	}
 
 	private void accept( TokenKind expected )

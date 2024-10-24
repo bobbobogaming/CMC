@@ -60,7 +60,10 @@ public class ASTViewer extends JFrame {
                         DefaultMutableTreeNode fieldNode = new DefaultMutableTreeNode(field.getName());
                         node.add(fieldNode);
                         for (Object item : (List<?>) value) {
-                            if (item instanceof AST) {
+                            if (item instanceof Terminal) {
+                                Terminal t = (Terminal) item;
+                                fieldNode.add(new DefaultMutableTreeNode(t.getClass().getSimpleName() + "/" + field.getName() + " : " + t.spelling));
+                            } else if (item instanceof AST) {
                                 fieldNode.add(createTree((AST) item));
                             } else {
                                 fieldNode.add(new DefaultMutableTreeNode(item.toString()));
