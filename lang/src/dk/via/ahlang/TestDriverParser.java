@@ -6,7 +6,7 @@ import dk.via.ahlang.ast.Program;
 import javax.swing.*;
 
 public class TestDriverParser {
-	private static final String EXAMPLES_DIR = System.getProperty("user.dir") + "\\lang\\src\\dk\\via\\ahlang";
+	private static final String EXAMPLES_DIR = DirectoryUtil.getExamplesDir();
 	public static void main(String[] args) {
 		JFileChooser fc = new JFileChooser( EXAMPLES_DIR );
 

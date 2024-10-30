@@ -2,8 +2,8 @@ package dk.via.ahlang;
 
 import javax.swing.*;
 
-public class TestDriver {
-    private static final String EXAMPLES_DIR = System.getProperty("user.dir") + "\\lang\\src\\dk\\via\\ahlang";
+public class TestDriverScanner {
+    private static final String EXAMPLES_DIR = DirectoryUtil.getExamplesDir();
     public static void main(String[] args) {
         JFileChooser fc = new JFileChooser(EXAMPLES_DIR);
 
