@@ -10,4 +10,9 @@ public class FunctionCall extends Expression {
         this.identifier = identifier;
         this.arguments = arguments;
     }
+
+    @Override
+    public Object visit(Visitor visitor, Object arg) {
+        return visitor.visitFunctionCall(this, arg);
+    }
 }

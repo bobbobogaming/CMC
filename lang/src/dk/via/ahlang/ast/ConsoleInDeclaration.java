@@ -6,4 +6,9 @@ public class ConsoleInDeclaration extends Statement{
     public ConsoleInDeclaration(Expression expression) {
         this.expression = expression;
     }
+
+    @Override
+    public Object visit(Visitor visitor, Object arg) {
+        return visitor.visitConsoleInDeclaration(this, arg);
+    }
 }

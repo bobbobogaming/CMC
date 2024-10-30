@@ -10,4 +10,9 @@ public class Assignment extends Statement {
         this.expression = expression;
         this.index = index;
     }
+
+    @Override
+    public Object visit(Visitor visitor, Object arg) {
+        return visitor.visitAssignment(this, arg);
+    }
 }

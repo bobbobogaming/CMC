@@ -6,4 +6,9 @@ public class Program implements AST{
     public Program(StatementCol collection) {
         this.collection = collection;
     }
+
+    @Override
+    public Object visit(Visitor visitor, Object arg) {
+        return visitor.visitProgram(this, arg);
+    }
 }

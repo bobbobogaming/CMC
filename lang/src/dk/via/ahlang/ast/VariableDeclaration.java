@@ -26,4 +26,9 @@ public class VariableDeclaration extends Statement{
         this.identifier = identifier;
         this.size = size;
     }
+
+    @Override
+    public Object visit(Visitor visitor, Object arg) {
+        return visitor.visitVariableDeclaration(this, arg);
+    }
 }

@@ -6,4 +6,9 @@ public class ConsoleOutDeclaration extends Statement{
     public ConsoleOutDeclaration(Expression expression) {
         this.expression = expression;
     }
+
+    @Override
+    public Object visit(Visitor visitor, Object arg) {
+        return visitor.visitConsoleOutDeclaration(this, arg);
+    }
 }

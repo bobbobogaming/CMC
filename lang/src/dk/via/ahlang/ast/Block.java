@@ -8,4 +8,9 @@ public class Block implements AST {
         this.statements = statements;
         this.returnExpression = expression;
     }
+
+    @Override
+    public Object visit(Visitor visitor, Object arg) {
+        return visitor.visitBlock(this, arg);
+    }
 }

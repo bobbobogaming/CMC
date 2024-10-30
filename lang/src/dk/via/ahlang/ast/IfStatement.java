@@ -10,4 +10,9 @@ public class IfStatement extends Statement {
         this.thenBlock = thenBlock;
         this.elseBlock = elseBlock;
     }
+
+    @Override
+    public Object visit(Visitor visitor, Object arg) {
+        return visitor.visitIfStatement(this, arg);
+    }
 }

@@ -8,4 +8,9 @@ public class Parameter implements AST{
         this.type = type;
         this.identifier = identifier;
     }
+
+    @Override
+    public Object visit(Visitor visitor, Object arg) {
+        return visitor.visitParameter(this, arg);
+    }
 }

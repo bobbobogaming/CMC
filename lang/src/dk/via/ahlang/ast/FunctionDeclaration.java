@@ -14,4 +14,9 @@ public class FunctionDeclaration extends Statement{
         this.returnType = returnType;
         this.block = block;
     }
+
+    @Override
+    public Object visit(Visitor visitor, Object arg) {
+        return visitor.visitFunctionDeclaration(this, arg);
+    }
 }

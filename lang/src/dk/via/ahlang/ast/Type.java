@@ -4,4 +4,9 @@ public class Type extends Terminal{ //Todo: Type should not inherent the express
     public Type(String spelling) {
         super(spelling);
     }
+
+    @Override
+    public Object visit(Visitor visitor, Object arg) {
+        return visitor.visitType(this, arg);
+    }
 }

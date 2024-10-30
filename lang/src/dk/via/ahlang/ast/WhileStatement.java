@@ -8,4 +8,9 @@ public class WhileStatement extends Statement {
         this.condition = condition;
         this.block = block;
     }
+
+    @Override
+    public Object visit(Visitor visitor, Object arg) {
+        return visitor.visitWhileStatement(this, arg);
+    }
 }

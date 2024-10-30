@@ -10,4 +10,9 @@ public class BinaryExpression extends Expression {
         this.operator = operator;
         this.right = right;
     }
+
+    @Override
+    public Object visit(Visitor visitor, Object arg) {
+        return visitor.visitBinaryExpression(this, arg);
+    }
 }
