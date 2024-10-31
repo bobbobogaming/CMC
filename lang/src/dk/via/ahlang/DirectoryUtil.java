@@ -9,9 +9,9 @@ public class DirectoryUtil {
     public static String getExamplesDir() {
         File workingDirectory = new File(System.getProperty("user.dir"));
         if (workingDirectory.isDirectory() && workingDirectory.getName().equals("CMC")) {
-            return System.getProperty("user.dir") + "\\lang\\src\\dk\\via\\ahlang";
+            return System.getProperty("user.dir") + "\\lang\\src\\dk\\via\\ahlang\\examples";
         } else if (workingDirectory.isDirectory() && workingDirectory.getName().equals("lang")) {
-            return System.getProperty("user.dir") + "\\src\\dk\\via\\ahlang";
+            return System.getProperty("user.dir") + "\\src\\dk\\via\\ahlang\\examples";
         } else {
             return System.getProperty("user.dir");
         }
