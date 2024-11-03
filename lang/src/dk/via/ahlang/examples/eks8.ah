@@ -1,0 +1,10 @@
+/* Defining two variables with the same name in different scopes is fine */
+#variable = 1;
+
+?1 == 1:
+    #variable = 2;
+..
+
+!1 == 2:
+    #variable = 3;
+..

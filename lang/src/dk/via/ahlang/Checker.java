@@ -35,11 +35,13 @@ public class Checker implements Visitor {
 
     @Override
     public Object visitConsoleInDeclaration(ConsoleInDeclaration consoleInDeclaration, Object arg) {
+        consoleInDeclaration.expression.visit(this, null);
         return null;
     }
 
     @Override
     public Object visitConsoleOutDeclaration(ConsoleOutDeclaration consoleOutDeclaration, Object arg) {
+        consoleOutDeclaration.expression.visit(this, null);
         return null;
     }
 
@@ -50,21 +52,43 @@ public class Checker implements Visitor {
 
     @Override
     public Object visitIfStatement(IfStatement ifStatement, Object arg) {
+        ifStatement.condition.visit(this, null);
+        ifStatement.thenBlock.visit(this, null);
+        if (ifStatement.elseBlock != null) {
+            ifStatement.elseBlock.visit(this, null);
+        }
+
         return null;
     }
 
     @Override
     public Object visitVariableDeclaration(VariableDeclaration variableDeclaration, Object arg) {
+        String idSpelling = (String) variableDeclaration.identifier.visit(this, null);
+
+        Statement existingVariableDeclaration = idTable.retrieveFromCurrentScope(idSpelling);
+        if (existingVariableDeclaration != null) {
+            System.out.println("Can't declare \"" + idSpelling + "\" in the same scope twice!");
+        } else {
+            idTable.enter(idSpelling, variableDeclaration);
+        }
+
         return null;
     }
 
     @Override
     public Object visitWhileStatement(WhileStatement whileStatement, Object arg) {
+        whileStatement.condition.visit(this, null);
+        whileStatement.block.visit(this, null);
+
         return null;
     }
 
     @Override
     public Object visitBlock(Block block, Object arg) {
+        idTable.openScope();
+        block.statements.visit(this, null);
+        idTable.closeScope();
+
         return null;
     }
 
@@ -85,17 +109,17 @@ public class Checker implements Visitor {
 
     @Override
     public Object visitIdentifier(Identifier identifier, Object arg) {
-        return null;
+        return identifier.spelling;
     }
 
     @Override
     public Object visitNumeric(Numeric numeric, Object arg) {
-        return null;
+        return numeric.spelling;
     }
 
     @Override
     public Object visitOperator(Operator operator, Object arg) {
-        return null;
+        return operator.spelling;
     }
 
     @Override

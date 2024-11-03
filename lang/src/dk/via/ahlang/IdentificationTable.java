@@ -14,23 +14,28 @@ public class IdentificationTable {
 
     public void enter( String id, Statement attr )
     {
-        IdEntry entry = find( id );
-
-        if( entry != null && entry.level == level )
-            System.out.println( id + " declared twice" );
-        else
-            idTable.add( new IdEntry( level, id, attr ) );
+        idTable.add( new IdEntry(level, id, attr ) );
     }
 
 
     public Statement retrieve( String id )
     {
-        IdEntry entry = find( id );
+        IdEntry entry = find(id, false);
 
         if( entry != null )
             return entry.attr;
         else
             return null;
+    }
+
+    public Statement retrieveFromCurrentScope(String id) {
+        IdEntry entry = find(id, true);
+
+        if (entry != null) {
+            return entry.attr;
+        } else {
+            return null;
+        }
     }
 
 
@@ -43,7 +48,7 @@ public class IdentificationTable {
     public void closeScope()
     {
         int pos = idTable.size() - 1;
-        while( pos >= 0 && idTable.get(pos).level == level ) {
+        while( pos >= 0 && idTable.get(pos).level == level) {
             idTable.remove( pos );
             pos--;
         }
@@ -52,11 +57,16 @@ public class IdentificationTable {
     }
 
 
-    private IdEntry find( String id )
+    private IdEntry find(String id, boolean currentLevelOnly)
     {
-        for( int i = idTable.size() - 1; i >= 0; i-- )
-            if( idTable.get(i).id.equals( id ) )
+        for( int i = idTable.size() - 1; i >= 0; i-- ) {
+            if( idTable.get(i).id.equals( id ) ) {
+                if (currentLevelOnly && idTable.get(i).level != level) {
+                    continue;
+                }
                 return idTable.get(i);
+            }
+        }
 
         return null;
     }

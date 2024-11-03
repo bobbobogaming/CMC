@@ -4,7 +4,7 @@ import java.util.List;
 
 public class VariableDeclaration extends Statement{
     Type type;
-    Identifier identifier;
+    public Identifier identifier;
     Expression initialValue;
     List<Expression> initialValues;
     Numeric size;

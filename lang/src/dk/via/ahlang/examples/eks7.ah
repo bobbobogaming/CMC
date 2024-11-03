@@ -1,0 +1,6 @@
+/* Defining two variables with the same name in the same scope should fail */
+#variable = 1;
+#variable = 2;
+
+#variableNoAssignment;
+#variableNoAssignment;
