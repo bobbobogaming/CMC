@@ -1,8 +1,8 @@
 package dk.via.ahlang.ast;
 
-public class Parameter implements AST{
-    Type type;
-    Identifier identifier;
+public class Parameter extends Statement {
+    public Type type;
+    public Identifier identifier;
 
     public Parameter(Type type, Identifier identifier) {
         this.type = type;

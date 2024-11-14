@@ -1,0 +1,3 @@
+/* Should fail, incorrect type */
+#something;
+something = 'yea';

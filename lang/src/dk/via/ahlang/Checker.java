@@ -30,6 +30,16 @@ public class Checker implements Visitor {
 
     @Override
     public Object visitAssignment(Assignment assignment, Object arg) {
+        String idSpelling = (String) assignment.identifier.visit(this, null);
+
+        VariableDeclaration existingVariableDeclaration = (VariableDeclaration) idTable.retrieveFromCurrentScope(idSpelling);
+        if (existingVariableDeclaration == null) {
+            System.out.println("\"" + idSpelling + "\" must be declared before it’s used");
+            return null;
+        }
+
+        // TODO: Check that the assignment matches the type of the expression
+
         return null;
     }
 
@@ -47,6 +57,23 @@ public class Checker implements Visitor {
 
     @Override
     public Object visitFunctionDeclaration(FunctionDeclaration functionDeclaration, Object arg) {
+        String idSpelling = (String) functionDeclaration.identifier.visit(this, null);
+
+        Statement existingVariableDeclaration = idTable.retrieveFromCurrentScope(idSpelling);
+        if (existingVariableDeclaration != null) {
+            System.out.println("Can't declare \"" + idSpelling + "\" in the same scope twice!");
+        } else {
+            idTable.enter(idSpelling, functionDeclaration);
+        }
+        idTable.openScope();
+        for (Parameter parameter : functionDeclaration.parameterList) {
+            parameter.visit(this, null);
+        }
+
+        functionDeclaration.block.visit(this, functionDeclaration.returnType);
+
+        idTable.closeScope();
+
         return null;
     }
 
@@ -85,15 +112,26 @@ public class Checker implements Visitor {
 
     @Override
     public Object visitBlock(Block block, Object arg) {
-        idTable.openScope();
         block.statements.visit(this, null);
-        idTable.closeScope();
+
+        if (arg != null) {
+            Type returnType = (Type) arg;
+            // TODO: compare returnType with expression type
+        }
 
         return null;
     }
 
     @Override
     public Object visitParameter(Parameter parameter, Object arg) {
+        String idSpelling = (String) parameter.identifier.visit(this, null);
+
+        Statement existingVariableDeclaration = idTable.retrieveFromCurrentScope(idSpelling);
+        if (existingVariableDeclaration != null) {
+            System.out.println("Can't declare \"" + idSpelling + "\" in the same scope twice!");
+        } else {
+            idTable.enter(idSpelling, parameter);
+        }
         return null;
     }
 

@@ -1,0 +1,3 @@
+/* Should fail, Declaration hasn't been done! */
+
+something = 'yea';

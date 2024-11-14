@@ -3,10 +3,10 @@ package dk.via.ahlang.ast;
 import java.util.List;
 
 public class FunctionDeclaration extends Statement{
-    Identifier identifier;
-    List<Parameter> parameterList;
-    Type returnType;
-    Block block;
+    public Identifier identifier;
+    public List<Parameter> parameterList;
+    public Type returnType;
+    public Block block;
 
     public FunctionDeclaration(Identifier identifier, List<Parameter> parameterList, Type returnType, Block block) {
         this.identifier = identifier;

@@ -3,11 +3,11 @@ package dk.via.ahlang.ast;
 import java.util.List;
 
 public class VariableDeclaration extends Statement{
-    Type type;
+    public Type type;
     public Identifier identifier;
-    Expression initialValue;
-    List<Expression> initialValues;
-    Numeric size;
+    public Expression initialValue;
+    public List<Expression> initialValues;
+    public Numeric size;
 
     public VariableDeclaration(Type type, Identifier identifier, Expression initialValue) {
         this.type = type;
