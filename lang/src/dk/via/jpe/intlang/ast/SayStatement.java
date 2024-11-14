@@ -1,7 +1,8 @@
 /*
  * 27.09.2016 Minor edit
  * 11.10.2010 dump() removed
- * 21.10.2009 New folder structure
+ * 29.10.2009 New package structure
+ * 22.10.2006 visit()
  * 29.09.2006 Original version
  */
  
@@ -17,5 +18,11 @@ public class SayStatement
 	public SayStatement( Expression exp )
 	{
 		this.exp = exp;
+	}
+	
+	
+	public Object visit( Visitor v, Object arg )
+	{
+		return v.visitSayStatement( this, arg );
 	}
 }

@@ -1,4 +1,5 @@
 /*
+ * 23.08.2019 TokenKind enum introduced
  * 16.08.2016 Minor editing
  * 29.10.2009 New package structure
  * 22.10.2006 isAssignOp(), isAddOp(), isMulOp()

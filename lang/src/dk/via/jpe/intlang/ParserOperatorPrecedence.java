@@ -1,12 +1,12 @@
 /*
- * 25.09.2019 TokenKind enum introduced
- * 13.09.2016 IParse gone, IScanner gone, minor editing
- * 11.10.2010 Small fix
- * 01.10.2010 Renamed
- * 21.10.2009 New folder structure
+ * 23.08.2019 TokenKind enum introduced
+ * 02.10.2016 Minor edit, IParser gone
+ * 15.10.2010 Renamed and using IParser
+ * 29.10.2009 New package structure
+ * 05.11.2006 Else part fixed
  * 24.10.2006 params in function declaration empty Declarations instead of null
  * 23.10.2006 IdList replaced by Declarations for function parameters
- * 22.10.2006 Error in parsePrimary fixed
+ * 22.10.2006 Operator precedence (non-terminals Expression1 and Expression2)
  * 01.10.2006 AST introduced
  * 28.09.2006 Original version (based on Watt&Brown)
  */
@@ -19,7 +19,7 @@ import static dk.via.jpe.intlang.TokenKind.*;
 import dk.via.jpe.intlang.ast.*;
 
 
-public class ParserAST
+public class ParserOperatorPrecedence
 {
 	private Scanner scan;
 	
@@ -27,7 +27,7 @@ public class ParserAST
 	private Token currentTerminal;
 	
 	
-	public ParserAST( Scanner scan )
+	public ParserOperatorPrecedence( Scanner scan )
 	{
 		this.scan = scan;
 		
@@ -35,7 +35,7 @@ public class ParserAST
 	}
 	
 	
-	public Program parseProgram()
+	public Object parseProgram()
 	{
 		Block block = parseBlock();
 		
@@ -156,11 +156,12 @@ public class ParserAST
 				accept( THEN );
 				Statements thenPart = parseStatements();
 				
-				Statements elsePart = null;
+				Statements elsePart;
 				if( currentTerminal.kind == ELSE ) {
 					accept( ELSE );
 					elsePart = parseStatements();
-				}
+				} else
+					elsePart = new Statements();
 				
 				accept( FI );
 				accept( SEMICOLON );
@@ -190,18 +191,47 @@ public class ParserAST
 		}
 	}
 	
-	
+
 	private Expression parseExpression()
 	{
+		Expression res = parseExpression1();
+		
+		if( currentTerminal.isAssignOperator() ) {
+			Operator op = parseOperator();
+			Expression tmp = parseExpression();
+			
+			res = new BinaryExpression( op, res, tmp );
+		}
+		
+		return res;
+	}
+	
+	
+	private Expression parseExpression1()
+	{
+		Expression res = parseExpression2();
+		while( currentTerminal.isAddOperator() ) {
+			Operator op = parseOperator();
+			Expression tmp = parseExpression2();
+			
+			res = new BinaryExpression( op, res, tmp );
+		}
+		
+		return res;
+	}
+	
+	
+	private Expression parseExpression2()
+	{
 		Expression res = parsePrimary();
-		while( currentTerminal.kind == OPERATOR ) {
+		while( currentTerminal.isMulOperator() ) {
 			Operator op = parseOperator();
 			Expression tmp = parsePrimary();
 			
 			res = new BinaryExpression( op, res, tmp );
 		}
 		
-	return res;
+		return res;
 	}
 	
 	

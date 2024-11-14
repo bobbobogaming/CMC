@@ -8,7 +8,9 @@
  
 package dk.via.jpe.intlang;
 
+
 import static dk.via.jpe.intlang.TokenKind.*;
+
 
 public class Scanner
 {

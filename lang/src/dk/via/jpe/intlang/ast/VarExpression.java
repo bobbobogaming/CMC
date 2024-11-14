@@ -1,8 +1,9 @@
 /*
  * 27.09.2016 Minor edit
  * 11.10.2010 dump() removed
- * 08.10.2010 name made public
- * 21.10.2009 New folder structure
+ * 29.10.2009 New package structure
+ * 27.10.2006 decl added
+ * 22.10.2006 visit()
  * 01.10.2006 Original version
  */
  
@@ -13,10 +14,17 @@ public class VarExpression
 	extends Expression
 {
 	public Identifier name;
+	public VariableDeclaration decl;
 	
 	
 	public VarExpression( Identifier name )
 	{
 		this.name = name;
+	}
+	
+	
+	public Object visit( Visitor v, Object arg )
+	{
+		return v.visitVarExpression( this, arg );
 	}
 }
