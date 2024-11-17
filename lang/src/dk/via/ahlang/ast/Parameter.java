@@ -1,6 +1,6 @@
 package dk.via.ahlang.ast;
 
-public class Parameter extends Statement {
+public class Parameter extends Statement implements DeclarationInterface {
     public Type type;
     public Identifier identifier;
 
@@ -12,5 +12,10 @@ public class Parameter extends Statement {
     @Override
     public Object visit(Visitor visitor, Object arg) {
         return visitor.visitParameter(this, arg);
+    }
+
+    @Override
+    public Type getType() {
+        return type;
     }
 }

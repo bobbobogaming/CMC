@@ -21,8 +21,7 @@ public class IdentificationTable {
     public Statement retrieve( String id )
     {
         IdEntry entry = find(id, false);
-
-        if( entry != null )
+        if(entry != null)
             return entry.attr;
         else
             return null;

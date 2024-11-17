@@ -1,0 +1,3 @@
+/*should fail, func hasnt been declared*/
+#pyramid;
+pyramid = stringConcat(pyramid, '#');

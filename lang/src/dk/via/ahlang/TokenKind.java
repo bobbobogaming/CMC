@@ -54,4 +54,11 @@ public enum TokenKind {
         }
         return map;
     }
+
+    /*public boolean hasSpelling(String spelling) {
+        if (spellings == null) {
+            System.out.println(spelling);
+        }
+        return this.spellings.contains(spelling);
+    }*/
 }

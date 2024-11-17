@@ -2,7 +2,7 @@ package dk.via.ahlang.ast;
 
 import java.util.List;
 
-public class FunctionDeclaration extends Statement{
+public class FunctionDeclaration extends Statement implements DeclarationInterface{
     public Identifier identifier;
     public List<Parameter> parameterList;
     public Type returnType;
@@ -18,5 +18,10 @@ public class FunctionDeclaration extends Statement{
     @Override
     public Object visit(Visitor visitor, Object arg) {
         return visitor.visitFunctionDeclaration(this, arg);
+    }
+
+    @Override
+    public Type getType() {
+        return returnType;
     }
 }

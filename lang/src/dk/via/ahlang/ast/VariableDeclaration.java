@@ -2,7 +2,7 @@ package dk.via.ahlang.ast;
 
 import java.util.List;
 
-public class VariableDeclaration extends Statement{
+public class VariableDeclaration extends Statement implements DeclarationInterface{
     public Type type;
     public Identifier identifier;
     public Expression initialValue;
@@ -30,5 +30,10 @@ public class VariableDeclaration extends Statement{
     @Override
     public Object visit(Visitor visitor, Object arg) {
         return visitor.visitVariableDeclaration(this, arg);
+    }
+
+    @Override
+    public Type getType() {
+        return type;
     }
 }

@@ -32,13 +32,12 @@ public class Checker implements Visitor {
     public Object visitAssignment(Assignment assignment, Object arg) {
         String idSpelling = (String) assignment.identifier.visit(this, null);
 
-        VariableDeclaration existingVariableDeclaration = (VariableDeclaration) idTable.retrieveFromCurrentScope(idSpelling);
+        DeclarationInterface existingVariableDeclaration = (DeclarationInterface) idTable.retrieveFromCurrentScope(idSpelling);
         if (existingVariableDeclaration == null) {
-            System.out.println("\"" + idSpelling + "\" must be declared before it’s used");
-            return null;
+            throw new RuntimeException("\"" + idSpelling + "\" must be declared before it’s used");
         }
 
-        // TODO: Check that the assignment matches the type of the expression
+        assignment.expression.visit(this, existingVariableDeclaration.getType());
 
         return null;
     }
@@ -61,7 +60,7 @@ public class Checker implements Visitor {
 
         Statement existingVariableDeclaration = idTable.retrieveFromCurrentScope(idSpelling);
         if (existingVariableDeclaration != null) {
-            System.out.println("Can't declare \"" + idSpelling + "\" in the same scope twice!");
+            throw new RuntimeException("Can't declare \"" + idSpelling + "\" in the same scope twice!");
         } else {
             idTable.enter(idSpelling, functionDeclaration);
         }
@@ -94,7 +93,7 @@ public class Checker implements Visitor {
 
         Statement existingVariableDeclaration = idTable.retrieveFromCurrentScope(idSpelling);
         if (existingVariableDeclaration != null) {
-            System.out.println("Can't declare \"" + idSpelling + "\" in the same scope twice!");
+            throw new RuntimeException("Can't declare \"" + idSpelling + "\" in the same scope twice!");
         } else {
             idTable.enter(idSpelling, variableDeclaration);
         }
@@ -128,7 +127,7 @@ public class Checker implements Visitor {
 
         Statement existingVariableDeclaration = idTable.retrieveFromCurrentScope(idSpelling);
         if (existingVariableDeclaration != null) {
-            System.out.println("Can't declare \"" + idSpelling + "\" in the same scope twice!");
+            throw new RuntimeException("Can't declare \"" + idSpelling + "\" in the same scope twice!");
         } else {
             idTable.enter(idSpelling, parameter);
         }
@@ -137,36 +136,97 @@ public class Checker implements Visitor {
 
     @Override
     public Object visitFunctionCall(FunctionCall functionCall, Object arg) {
+        String idSpelling = (String) functionCall.identifier.visit(this, null);
+
+        Statement functionStatement = idTable.retrieve(idSpelling);
+        if(functionStatement == null) {
+            throw new RuntimeException("No func by name \"" + idSpelling + "\" has been declared");
+        }
+        if(!(functionStatement instanceof FunctionDeclaration)) {
+            throw new RuntimeException("Identifier \"" + idSpelling + "\" doesn't belong to a function!");
+        }
+        FunctionDeclaration functionDeclaration = (FunctionDeclaration) functionStatement;
+        if(functionDeclaration.parameterList.size() - functionCall.arguments.size() != 0) {
+            throw new RuntimeException("Parameter and and argument size doesn't align for call \"" + idSpelling + "\"");
+        }
+
+        for (int i = 0; i < functionDeclaration.parameterList.size(); i++) {
+            functionCall.arguments.get(i).visit(this, functionDeclaration.parameterList.get(i).type);
+        }
+
         return null;
     }
 
     @Override
     public Object visitBinaryExpression(BinaryExpression binaryExpression, Object arg) {
+        Type type = null;
+        if (arg != null) {
+            type = (Type) arg;
+        }
+
+        binaryExpression.left.visit(this, type);
+        binaryExpression.operator.visit(this, type);
+        binaryExpression.right.visit(this, type);
+
         return null;
     }
 
     @Override
     public Object visitIdentifier(Identifier identifier, Object arg) {
+        if (arg instanceof Type type) {
+            Statement statement = idTable.retrieve(identifier.spelling);
+            if (statement == null) {
+                throw new RuntimeException("Identifier cas not found: \"" + identifier.spelling + "\"");
+            }
+            DeclarationInterface declarationInterface = (DeclarationInterface) idTable.retrieve(identifier.spelling);
+            checkTypeVisit(declarationInterface.getType(), type);
+        }
         return identifier.spelling;
     }
 
     @Override
     public Object visitNumeric(Numeric numeric, Object arg) {
+        if (arg instanceof Type type) {
+            checkTypeVisit(new Type("#"), type);
+            return TokenKind.NUMERIC;
+        }
         return numeric.spelling;
     }
 
     @Override
     public Object visitOperator(Operator operator, Object arg) {
+        if (arg instanceof Type type && type.spelling.equals(TokenKind.STRING.toString())) {
+            if (operator.spelling.equals("+")) {
+                return null;
+            }
+            throw new RuntimeException("Strings can only use operation: \"+\" Is: \" Not " + operator.spelling + "\"");
+        }
         return operator.spelling;
     }
 
     @Override
     public Object visitStringAH(StringAH stringAH, Object arg) {
-        return null;
+        if (arg instanceof Type type) {
+            checkTypeVisit(new Type("§"), type);
+        }
+        return stringAH.toString();
+    }
+
+    /*private void checkTypeVisit(TokenKind wantedReturn, Type returnType) {
+        if (wantedReturn.hasSpelling(returnType.spelling))
+            return;
+        throw new RuntimeException("Not expected type: Expected: \"" + wantedReturn + "\" Is: \"" + returnType.spelling + "\"");
+    }*/
+
+    private void checkTypeVisit(Type wantedReturn, Type returnType) {
+        if(wantedReturn.spelling.equals(returnType.spelling)) {
+            return;
+        }
+        throw new RuntimeException("Not expected type: Expected: \"" + wantedReturn.spelling + "\" Is: \"" + returnType.spelling + "\"");
     }
 
     @Override
     public Object visitType(Type type, Object arg) {
-        return null;
+        return type.spelling;
     }
 }
