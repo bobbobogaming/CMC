@@ -1,6 +1,5 @@
 /* Declaring a twice in parameterList should fail */
 
-#a;
 <->power(#a, #a)#:
     -> 5 + 10;
 ..

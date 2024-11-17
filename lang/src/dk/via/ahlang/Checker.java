@@ -79,9 +79,13 @@ public class Checker implements Visitor {
     @Override
     public Object visitIfStatement(IfStatement ifStatement, Object arg) {
         ifStatement.condition.visit(this, null);
+        idTable.openScope();
         ifStatement.thenBlock.visit(this, null);
+        idTable.closeScope();
         if (ifStatement.elseBlock != null) {
+            idTable.openScope();
             ifStatement.elseBlock.visit(this, null);
+            idTable.closeScope();
         }
 
         return null;
@@ -104,8 +108,9 @@ public class Checker implements Visitor {
     @Override
     public Object visitWhileStatement(WhileStatement whileStatement, Object arg) {
         whileStatement.condition.visit(this, null);
+        idTable.openScope();
         whileStatement.block.visit(this, null);
-
+        idTable.closeScope();
         return null;
     }
 
@@ -147,7 +152,7 @@ public class Checker implements Visitor {
         }
         FunctionDeclaration functionDeclaration = (FunctionDeclaration) functionStatement;
         if(functionDeclaration.parameterList.size() - functionCall.arguments.size() != 0) {
-            throw new RuntimeException("Parameter and and argument size doesn't align for call \"" + idSpelling + "\"");
+            throw new RuntimeException("Parameter and/or argument size doesn't align for call \"" + idSpelling + "\"");
         }
 
         for (int i = 0; i < functionDeclaration.parameterList.size(); i++) {
@@ -218,11 +223,11 @@ public class Checker implements Visitor {
         throw new RuntimeException("Not expected type: Expected: \"" + wantedReturn + "\" Is: \"" + returnType.spelling + "\"");
     }*/
 
-    private void checkTypeVisit(Type wantedReturn, Type returnType) {
-        if(wantedReturn.spelling.equals(returnType.spelling)) {
+    private void checkTypeVisit(Type type, Type returnType) {
+        if(type.spelling.equals(returnType.spelling)) {
             return;
         }
-        throw new RuntimeException("Not expected type: Expected: \"" + wantedReturn.spelling + "\" Is: \"" + returnType.spelling + "\"");
+        throw new RuntimeException("Wrong type: Expected: \"" + returnType.spelling + "\" Is: \"" + type.spelling + "\"");
     }
 
     @Override

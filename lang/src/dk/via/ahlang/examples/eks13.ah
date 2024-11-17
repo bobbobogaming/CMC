@@ -1,0 +1,6 @@
+/*Should fail, giving string as a argument*/
+<->stringCat(#a,#b)#:
+..
+
+#pyramid;
+pyramid = stringCat(pyramid, '#');
