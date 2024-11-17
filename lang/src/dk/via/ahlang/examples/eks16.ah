@@ -1,0 +1,11 @@
+/*Should fail, wrong return value*/
+
+<->power(#a, #b)#:
+	#result = 1;
+	!b > 0:
+ 		result = result * a;
+		b = b - 1;
+		/*Dette er en test*/
+	..
+	-> 'Hej' /*Det er dette også*/  ;
+..

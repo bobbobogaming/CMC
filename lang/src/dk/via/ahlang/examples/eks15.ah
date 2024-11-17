@@ -1,0 +1,11 @@
+<->power(#a, #b)#:
+	#result = 1;
+	!b > 0:
+ 		result = result * a;
+		b = b - 1;
+		/*Dette er en test*/
+	..
+	-> result /*Det er dette også*/  ;
+..
+
+§todo = power(10,20);

@@ -1,0 +1,2 @@
+/*Should fail, dont wanna do other than the big + cause thats just not what we wanna do cause that would be some weird thingy dingy with how would you even do it like would you take the value of w times the value of d or would you take a feel on what a * b is dont really know me dude gotta check some hard facts with einstain or something*/
+§string = 'ha' * 'hi';

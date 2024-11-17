@@ -32,12 +32,16 @@ public class Checker implements Visitor {
     public Object visitAssignment(Assignment assignment, Object arg) {
         String idSpelling = (String) assignment.identifier.visit(this, null);
 
-        DeclarationInterface existingVariableDeclaration = (DeclarationInterface) idTable.retrieveFromCurrentScope(idSpelling);
-        if (existingVariableDeclaration == null) {
+        DeclarationInterface declaration = (DeclarationInterface) idTable.retrieve(idSpelling);
+        if (declaration == null) {
             throw new RuntimeException("\"" + idSpelling + "\" must be declared before it’s used");
         }
 
-        assignment.expression.visit(this, existingVariableDeclaration.getType());
+        if (assignment.index != null && declaration instanceof VariableDeclaration variable) {
+
+        }
+
+        assignment.expression.visit(this, declaration.getType());
 
         return null;
     }
@@ -102,6 +106,14 @@ public class Checker implements Visitor {
             idTable.enter(idSpelling, variableDeclaration);
         }
 
+        if (variableDeclaration.initialValue != null) {
+            variableDeclaration.initialValue.visit(this, variableDeclaration.type);
+        } else if (variableDeclaration.initialValues!= null) {
+            for (Expression expression : variableDeclaration.initialValues) {
+                expression.visit(this, variableDeclaration.type);
+            }
+        }
+
         return null;
     }
 
@@ -118,9 +130,8 @@ public class Checker implements Visitor {
     public Object visitBlock(Block block, Object arg) {
         block.statements.visit(this, null);
 
-        if (arg != null) {
-            Type returnType = (Type) arg;
-            // TODO: compare returnType with expression type
+        if (block.returnExpression != null) {
+            block.returnExpression.visit(this, arg);
         }
 
         return null;
@@ -159,6 +170,9 @@ public class Checker implements Visitor {
             functionCall.arguments.get(i).visit(this, functionDeclaration.parameterList.get(i).type);
         }
 
+        if(arg instanceof Type type) {
+            checkTypeVisit(type, functionDeclaration.returnType);
+        }
         return null;
     }
 
@@ -193,14 +207,14 @@ public class Checker implements Visitor {
     public Object visitNumeric(Numeric numeric, Object arg) {
         if (arg instanceof Type type) {
             checkTypeVisit(new Type("#"), type);
-            return TokenKind.NUMERIC;
         }
         return numeric.spelling;
     }
 
     @Override
     public Object visitOperator(Operator operator, Object arg) {
-        if (arg instanceof Type type && type.spelling.equals(TokenKind.STRING.toString())) {
+
+        if (arg instanceof Type type && type.spelling.equals("§")) {
             if (operator.spelling.equals("+")) {
                 return null;
             }
@@ -214,7 +228,7 @@ public class Checker implements Visitor {
         if (arg instanceof Type type) {
             checkTypeVisit(new Type("§"), type);
         }
-        return stringAH.toString();
+        return stringAH.spelling;
     }
 
     /*private void checkTypeVisit(TokenKind wantedReturn, Type returnType) {

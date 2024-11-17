@@ -1,0 +1,3 @@
+/*Should fail, contains string*/
+
+#temp = 1 + 17 + 230 / 20 * 'Look at me big boiiii';
