@@ -1,8 +1,6 @@
-/*Should fail, todo is of type string, power return numeric*/
-
 <->power(#a, #b)#:
 	#result = 1;
-	!b > 0:
+	!'yea' == 'yea':
  		result = result * a;
 		b = b - 1;
 		/*Dette er en test*/
@@ -10,4 +8,4 @@
 	-> result /*Det er dette også*/  ;
 ..
 
-§todo = power(10,20);
+#todo = 10;

@@ -1,7 +1,6 @@
 package dk.via.ahlang;
 
 import dk.via.ahlang.ast.*;
-import dk.via.jpe.intlang.ast.Declaration;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -93,6 +92,7 @@ public class Parser {
 		accept(SEMICOLON);
 		return new Assignment(identifier, expression, index);
 	}
+
 	private List<Expression> parseFunctionArguments() {
 		accept(LEFTPARAN);
 		List<Expression> list = parseArgumentList();
@@ -229,30 +229,11 @@ public class Parser {
 			accept(LEFTPARAN);
 			List<Parameter> parameters = parseParamList();
 			accept(RIGHTPARAN);
-			Type returnType = null;
-			if (currentTerminal.kind == TYPE) { //TODO: Dont remember if we wanted to declare return type, but we have return as optional
-				returnType = new Type(currentTerminal.spelling);
-				accept(TYPE);
-			}
+			Type returnType = new Type(currentTerminal.spelling);
+			accept(TYPE);
 			Block block = parseBlock();
 			return new FunctionDeclaration(identifier, parameters,returnType, block);
 		}
-	}
-
-	private void parseArrayDeclaration() {
-		accept(OPENBRACKET);
-		if(currentTerminal.kind == NUMERIC) {
-			Numeric numeric = new Numeric(currentTerminal.spelling);
-			accept(NUMERIC);
-			accept(CLOSEBRACKET);
-			accept(SEMICOLON);
-		}
-		accept(CLOSEBRACKET);
-		accept(ASSIGN);
-		accept(OPENCURLYBRACE);
-		List<Expression> list = parseArgumentList();
-		accept(CLOSECURLYBRACE);
-		accept(SEMICOLON);
 	}
 
 	private List<Parameter> parseParamList() {

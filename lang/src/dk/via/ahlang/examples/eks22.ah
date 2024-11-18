@@ -1,0 +1,10 @@
+/*Should fail, no return value in func*/
+<->power(#a, #b)#:
+	#result = 1;
+	!b > 0:
+ 		result = result * a;
+		b = b - 1;
+		/*Dette er en test*/
+	..
+	/*-> result; "no return value is given"*/
+..

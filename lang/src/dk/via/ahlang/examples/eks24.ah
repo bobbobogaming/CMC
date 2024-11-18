@@ -1,0 +1,3 @@
+/*should not be possible*/
+#myNumbers2[3] = {5, 10, 50};
+

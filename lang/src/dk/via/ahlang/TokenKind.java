@@ -26,7 +26,7 @@ public enum TokenKind {
     IF("?"),
     ELSE("¤"),
     WHILE("!"),
-    TYPE("½", "#", "§"),
+    TYPE("#", "§"),
     FUNCTIONKEY("<->"),
     CONSOLEIN("<<"),
     CONSOLEOUT(">>"),
@@ -55,10 +55,10 @@ public enum TokenKind {
         return map;
     }
 
-    /*public boolean hasSpelling(String spelling) {
+    public boolean hasSpelling(String spelling) {
         if (spellings == null) {
             System.out.println(spelling);
         }
         return this.spellings.contains(spelling);
-    }*/
+    }
 }

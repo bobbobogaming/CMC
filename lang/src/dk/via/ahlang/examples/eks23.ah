@@ -1,0 +1,9 @@
+/*Should fail on index 5*/
+#myNumbers[5];
+
+myNumbers[0] = 10;
+myNumbers[1] = 20;
+myNumbers[2] = 30;
+myNumbers[3] = 40;
+myNumbers[4] = 50;
+myNumbers[5] = 60;
