@@ -19,4 +19,5 @@ public interface Visitor {
     Object visitOperator(Operator operator, Object arg);
     Object visitStringAH(StringAH stringAH, Object arg);
     Object visitType(Type type, Object arg);
+    Object visitArrayCall(ArrayCall arrayCall, Object arg);
 }

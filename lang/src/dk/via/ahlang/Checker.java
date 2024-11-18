@@ -39,7 +39,7 @@ public class Checker implements Visitor {
 
         if (assignment.index != null && declaration instanceof VariableDeclaration variable) {
             int index = Integer.parseInt(assignment.index.spelling);
-            int size = Integer.parseInt(variable.size.spelling);
+            int size = variable.size == null ? variable.initialValues.size() : Integer.parseInt(variable.size.spelling);
             if(index >= size || index < 0) {
                 throw new RuntimeException("Index out of range. Index: " + index + ", Size: " + size);
             }
@@ -274,5 +274,26 @@ public class Checker implements Visitor {
     @Override
     public Object visitType(Type type, Object arg) {
         return type.spelling;
+    }
+
+    @Override
+    public Object visitArrayCall(ArrayCall arrayCall, Object arg) {
+        Statement existingVariableDeclaration = idTable.retrieve(arrayCall.identifier.spelling);
+        if(existingVariableDeclaration == null) {
+            throw new RuntimeException("Identifier was not found: \"" + arrayCall.identifier.spelling + "\"");
+        }
+        if (!(existingVariableDeclaration instanceof VariableDeclaration variableDeclaration) || (variableDeclaration.size == null && variableDeclaration.initialValues == null)) {
+            throw new RuntimeException("Identifier not of right type: \"" + arrayCall.identifier.spelling + "\"");
+        }
+        int size = variableDeclaration.size == null ? variableDeclaration.initialValues.size() : Integer.parseInt(variableDeclaration.size.spelling);
+        int index = Integer.parseInt(arrayCall.index.spelling);
+        if (index >= size || index < 0) { //TODO: Some of this code can be generalized from other functions
+            throw new RuntimeException("Index out of range. Index: " + index + ", Size: " + size);
+        }
+        Type varType = variableDeclaration.type;
+        if (arg instanceof Type type) {
+            checkTypeVisit(varType, type, arrayCall.identifier.spelling);
+        }
+        return varType;
     }
 }

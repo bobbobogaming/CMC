@@ -1,0 +1,3 @@
+/*should fail, wrong type*/
+#myNumbers2[] = {5, 10, 50};
+§yeeee = myNumbers2[1]

@@ -1,0 +1,3 @@
+/*Should fail, out of bounds*/
+#myNumbers2[] = {5, 10, 50};
+#yeeee = myNumbers2[3]

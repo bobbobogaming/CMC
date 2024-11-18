@@ -11,6 +11,6 @@ public class ArrayCall extends Expression {
 
     @Override
     public Object visit(Visitor visitor, Object arg) {
-        return null;
+        return visitor.visitArrayCall(this, arg);
     }
 }
