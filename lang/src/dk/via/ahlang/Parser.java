@@ -180,6 +180,13 @@ public class Parser {
 			if (currentTerminal.kind == LEFTPARAN) {
 				return new FunctionCall(identifier, parseFunctionArguments());
 			}
+			if (currentTerminal.kind == OPENBRACKET) {
+				accept(OPENBRACKET);
+				Numeric numeric = new Numeric(currentTerminal.spelling);
+				accept(NUMERIC);
+				accept(CLOSEBRACKET);
+				return new ArrayCall(identifier, numeric);
+			}
 			return identifier;
 		}
 		else if (currentTerminal.kind == LEFTPARAN) {
