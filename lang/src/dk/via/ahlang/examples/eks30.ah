@@ -1,0 +1,3 @@
+#myNumbers2[] = {5, 10, 50};
+
+#newNumber = 5 + 10 * 50 - myNumbers2[1] + 2;

@@ -8,7 +8,6 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import java.awt.*;
 import java.lang.reflect.Field;
-import java.util.Collection;
 import java.util.List;
 
 public class ASTViewer extends JFrame {
