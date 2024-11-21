@@ -12,6 +12,7 @@ public class Scanner {
     private final StringBuilder currentSpelling = new StringBuilder();
     private final Map<String, TokenKind> stringTokens;
     private final Set<String> multiCharTokens = new HashSet<>();
+    private StringBuilder inCaseOfString = new StringBuilder();
 
     public Scanner(SourceFile source) {
         this.source = source;
@@ -30,11 +31,19 @@ public class Scanner {
     private void  appendChar() {
         currentSpelling.append(currentChar);
         currentChar = source.getSource();
+        inCaseOfString.delete(0, inCaseOfString.length());
         skipWhitespace();
+    }
+
+    //Very good logic, hmm me smart
+    private void appendString() {
+        currentSpelling.append(currentChar);
+        currentChar = source.getSource();
     }
 
     private void skipWhitespace() {
         while (Character.isWhitespace(currentChar)) {
+            inCaseOfString.append(currentChar);
             currentChar = source.getSource();
         }
     }
@@ -71,11 +80,12 @@ public class Scanner {
 
     private TokenKind handleStringToken() {
         currentSpelling.delete(0, currentSpelling.length());
+        currentSpelling.append(inCaseOfString.toString());
         while(stringTokens.get(Character.toString(currentChar)) != STRING) {
             if(stringTokens.get(Character.toString(currentChar)) == EOT) {
                 throw new IllegalArgumentException(ERROR + " Current Char: " + currentChar + " Current Spelling: " + currentSpelling + " Missing end indicator for string token");
             }
-            appendChar();
+            appendString();
         } //This isn't very flex in case we want to change the symbol to more than one, but i wanna get a move on
         currentChar = source.getSource();
         return STRING;
