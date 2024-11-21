@@ -78,3 +78,6 @@ fabric.properties
 
 # Word temp file
 ~$*.docx
+
+# TAM files
+lang/src/dk/via/ahlang/examples/tam
