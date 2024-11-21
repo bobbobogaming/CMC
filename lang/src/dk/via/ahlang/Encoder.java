@@ -110,13 +110,8 @@ public class Encoder implements Visitor {
         if (t.spelling.equals("§")) {
             int jumpAdr = nextAdr;
             emit(Machine.CALLop, 0, Machine.PBr, Machine.putDisplacement);
-            emit(Machine.LOADLop,1, 0, 0);
-            emit(Machine.CALLop,0, Machine.PBr, Machine.eqDisplacement);
-            emit(Machine.JUMPIFop,1,Machine.CBr, jumpAdr);
+            emit(Machine.JUMPIFop,1,0, jumpAdr);
             emit(Machine.CALLop, 0, Machine.PBr, Machine.puteolDisplacement);
-            //for (int i = 0; i < 3;i++) {
-            //}
-            //emit(Machine.JUMPIFop);
         }
 
         return null;
@@ -193,10 +188,13 @@ public class Encoder implements Visitor {
 
         String str = stringAH.spelling;
 
-        emit(Machine.LOADLop, 1, 0, 0);
+        emit(Machine.LOADLop, 0, 0, 0);
 
         char[] stringAHChars = str.toCharArray();
         for (int i = stringAHChars.length - 1; i >= 0; i--) {
+            if (i != stringAHChars.length - 1) {
+                emit(Machine.LOADLop, 0, 0, 1);
+            }
             emit( Machine.LOADLop, 1, 0, stringAHChars[i] );
         }
 
