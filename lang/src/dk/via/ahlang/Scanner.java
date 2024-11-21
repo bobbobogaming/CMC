@@ -70,13 +70,14 @@ public class Scanner {
     }
 
     private TokenKind handleStringToken() {
+        currentSpelling.delete(0, currentSpelling.length());
         while(stringTokens.get(Character.toString(currentChar)) != STRING) {
             if(stringTokens.get(Character.toString(currentChar)) == EOT) {
                 throw new IllegalArgumentException(ERROR + " Current Char: " + currentChar + " Current Spelling: " + currentSpelling + " Missing end indicator for string token");
             }
             appendChar();
         } //This isn't very flex in case we want to change the symbol to more than one, but i wanna get a move on
-        appendChar();
+        currentChar = source.getSource();
         return STRING;
     }
 
