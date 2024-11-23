@@ -1,0 +1,6 @@
+/* simple if statement */
+?1+1==2:
+>> 'true';
+..¤:
+>> 'false';
+..

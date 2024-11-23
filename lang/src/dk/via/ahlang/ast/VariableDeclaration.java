@@ -1,5 +1,7 @@
 package dk.via.ahlang.ast;
 
+import dk.via.ahlang.Address;
+
 import java.util.List;
 
 public class VariableDeclaration extends Statement implements DeclarationInterface{
@@ -8,6 +10,7 @@ public class VariableDeclaration extends Statement implements DeclarationInterfa
     public Expression initialValue;
     public List<Expression> initialValues;
     public Numeric size;
+    public Address address;
 
     public VariableDeclaration(Type type, Identifier identifier, Expression initialValue) {
         this.type = type;

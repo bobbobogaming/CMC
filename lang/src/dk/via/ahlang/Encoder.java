@@ -110,7 +110,7 @@ public class Encoder implements Visitor {
         if (t.spelling.equals("§")) {
             int jumpAdr = nextAdr;
             emit(Machine.CALLop, 0, Machine.PBr, Machine.putDisplacement);
-            emit(Machine.JUMPIFop,1,0, jumpAdr);
+            emit(Machine.JUMPIFop,1,Machine.CBr, jumpAdr);
             emit(Machine.CALLop, 0, Machine.PBr, Machine.puteolDisplacement);
         }
 
@@ -124,12 +124,30 @@ public class Encoder implements Visitor {
 
     @Override
     public Object visitIfStatement(IfStatement ifStatement, Object arg) {
+        ifStatement.condition.visit(this,true);
+
+        int jump1Adr = nextAdr;
+        emit(Machine.JUMPIFop, 0, Machine.CBr,0);
+
+        ifStatement.thenBlock.visit(this,null);
+
+        int jump2Adr = nextAdr;
+        emit(Machine.JUMPop, 0 ,Machine.CBr,0);
+
+        patch(jump1Adr,nextAdr);
+        ifStatement.elseBlock.visit(this,null);
+
+        patch(jump2Adr,nextAdr);
         return null;
     }
 
     @Override
     public Object visitVariableDeclaration(VariableDeclaration variableDeclaration, Object arg) {
-        return null;
+        String idSpelling = (String) variableDeclaration.identifier.visit(this, null);
+        //variableDeclaration.
+        variableDeclaration.address = (Address) arg;
+        emit(Machine.PUSHop,0,0,1);
+        return new Address((Address) arg,1);
     }
 
     @Override
@@ -139,6 +157,9 @@ public class Encoder implements Visitor {
 
     @Override
     public Object visitBlock(Block block, Object arg) {
+        currentLevel++;
+        block.statements.visit(this,null);
+        currentLevel--;
         return null;
     }
 
@@ -154,8 +175,40 @@ public class Encoder implements Visitor {
 
     @Override
     public Object visitBinaryExpression(BinaryExpression binaryExpression, Object arg) {
-        Type t = (Type) binaryExpression.left.visit(this, true);
+        String op = binaryExpression.operator.spelling;
 
+        int oldAdr = nextAdr;
+        Type t = (Type) binaryExpression.left.visit(this, true);
+        if (t.spelling.equals("§") && op.equals("+")) {
+            nextAdr = oldAdr;
+            binaryExpression.right.visit(this, true);
+            oldAdr = nextAdr;
+            binaryExpression.left.visit(this, true);
+            patch(oldAdr,1);
+        } else {
+            binaryExpression.right.visit(this, true);
+        }
+
+        if (t.spelling.equals("#")) {
+            switch (op) {
+                case "+" ->
+                    emit(Machine.CALLop, 0, Machine.PBr, Machine.addDisplacement);
+                case "-" ->
+                    emit(Machine.CALLop, 0, Machine.PBr, Machine.subDisplacement);
+                case "*" ->
+                    emit(Machine.CALLop, 0, Machine.PBr, Machine.multDisplacement);
+                case "/" ->
+                    emit(Machine.CALLop, 0, Machine.PBr, Machine.divDisplacement);
+                case ">" ->
+                    emit(Machine.CALLop, 0, Machine.PBr, Machine.gtDisplacement);
+                case "<" ->
+                    emit(Machine.CALLop, 0, Machine.PBr, Machine.ltDisplacement);
+                case "==" -> {
+                    emit( Machine.LOADLop, 1, 0, 1 );
+                    emit(Machine.CALLop, 0, Machine.PBr, Machine.eqDisplacement);
+                }
+            }
+        }
 
         return t;
     }
