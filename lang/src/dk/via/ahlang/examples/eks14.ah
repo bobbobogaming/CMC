@@ -1,5 +1,6 @@
 /*Should fail, not enough arguments*/
 <->stringCat(#a,#b)#:
+ -> a + b;
 ..
 
 #pyramid;

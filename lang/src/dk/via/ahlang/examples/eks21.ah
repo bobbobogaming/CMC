@@ -1,3 +1,4 @@
+/*should fail, strings not allowed for comparison*/
 <->power(#a, #b)#:
 	#result = 1;
 	!'yea' == 'yea':

@@ -88,6 +88,7 @@ public class Scanner {
             appendString();
         } //This isn't very flex in case we want to change the symbol to more than one, but i wanna get a move on
         currentChar = source.getSource();
+        skipWhitespace();
         return STRING;
     }
 

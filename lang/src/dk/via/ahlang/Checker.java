@@ -244,7 +244,7 @@ public class Checker implements Visitor {
             if (operator.spelling.equals("+")) {
                 return null;
             }
-            throw new RuntimeException("Strings can only use operation: \"+\" Is: \" Not " + operator.spelling + "\"");
+            throw new RuntimeException("Strings can only use operation: \"+\" Not: \"" + operator.spelling + "\"");
         }
         return operator.spelling;
     }
