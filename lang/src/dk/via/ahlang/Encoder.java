@@ -102,7 +102,11 @@ public class Encoder implements Visitor {
     @Override
     public Object visitConsoleOutDeclaration(ConsoleOutDeclaration consoleOutDeclaration, Object arg) {
         Type t = (Type)consoleOutDeclaration.expression.visit(this, true);
-
+        if (t == null) {
+            System.out.println(((Address)arg).displacement);
+            //emit( Machine.LOADop, 1, register, adr.displacement );
+            return null;
+        }
         if (t.spelling.equals("#")) {
             emit(Machine.CALLop, 0, Machine.PBr, Machine.putintDisplacement);
             emit(Machine.CALLop, 0, Machine.PBr, Machine.puteolDisplacement);
@@ -142,11 +146,13 @@ public class Encoder implements Visitor {
     }
 
     @Override
-    public Object visitVariableDeclaration(VariableDeclaration variableDeclaration, Object arg) {
-        String idSpelling = (String) variableDeclaration.identifier.visit(this, null);
-        //variableDeclaration.
+    public Object visitVariableDeclaration(VariableDeclaration variableDeclaration, Object arg) { // not working right
         variableDeclaration.address = (Address) arg;
-        emit(Machine.PUSHop,0,0,1);
+        if (variableDeclaration.initialValue == null) {
+            emit(Machine.PUSHop,0,0,1);
+        } else {
+            variableDeclaration.initialValue.visit(this,true);
+        }
         return new Address((Address) arg,1);
     }
 
@@ -221,7 +227,6 @@ public class Encoder implements Visitor {
     @Override
     public Object visitNumeric(Numeric numeric, Object arg) {
         boolean valueNeeded = ((Boolean) arg).booleanValue();
-
 
         Integer lit = Integer.valueOf(numeric.spelling);
 
