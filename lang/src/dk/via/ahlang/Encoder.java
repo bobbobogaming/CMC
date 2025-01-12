@@ -35,6 +35,16 @@ public class Encoder implements Visitor {
         Machine.code[adr].d = d;
     }
 
+    private void patchOutInstruction(int adrStart) {
+        patchOutInstruction(adrStart,1);
+    }
+
+    private void patchOutInstruction(int adrStart, int adrAmount) {
+        for (int i = adrStart;Machine.code[i]!=null;i++) {
+            Machine.code[i] = Machine.code[i + adrAmount];
+        }
+    }
+
     private int displayRegister(int currentLevel, int entityLevel)
     {
         if(entityLevel == 0)
@@ -114,7 +124,11 @@ public class Encoder implements Visitor {
         if (t.spelling.equals("§")) {
             int jumpAdr = nextAdr;
             emit(Machine.CALLop, 0, Machine.PBr, Machine.putDisplacement);
-            emit(Machine.JUMPIFop,1,Machine.CBr, jumpAdr);
+            emit(Machine.LOADop, 1, Machine.STr, -1);
+            emit(Machine.LOADLop, 1, 0, 0);
+            emit(Machine.LOADLop, 1, 0, 1);
+            emit(Machine.CALLop, 0, Machine.PBr, Machine.eqDisplacement);
+            emit(Machine.JUMPIFop,0,Machine.CBr, jumpAdr);
             emit(Machine.CALLop, 0, Machine.PBr, Machine.puteolDisplacement);
         }
 
@@ -190,7 +204,8 @@ public class Encoder implements Visitor {
             binaryExpression.right.visit(this, true);
             oldAdr = nextAdr;
             binaryExpression.left.visit(this, true);
-            patch(oldAdr,1);
+            patchOutInstruction(oldAdr);
+            nextAdr--;
         } else {
             binaryExpression.right.visit(this, true);
         }
@@ -250,9 +265,6 @@ public class Encoder implements Visitor {
 
         char[] stringAHChars = str.toCharArray();
         for (int i = stringAHChars.length - 1; i >= 0; i--) {
-            if (i != stringAHChars.length - 1) {
-                emit(Machine.LOADLop, 0, 0, 1);
-            }
             emit( Machine.LOADLop, 1, 0, stringAHChars[i] );
         }
 
